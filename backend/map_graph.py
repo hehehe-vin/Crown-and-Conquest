@@ -1,4 +1,4 @@
-from data.map_data import europe_map
+from map_data import europe_map
 
 class MapGraph:
 
