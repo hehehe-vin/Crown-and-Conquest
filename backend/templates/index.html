@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Crown &amp; Conquest — DAA Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root{
+  --gold:#e9c176; --gold2:#ffdea5; --parch:#d4b97a; --parch2:#c5a059;
+  --ink:#1a0e06;  --imperial:#7b1f1f; --imperial2:#a52828;
+  --forest:#2c4025; --steel:#3a5c8a;
+  --fog:#9e9080;  --glow:rgba(233,193,118,.35);
+  --panel-bg:linear-gradient(180deg,#1c0907 0%,#120805 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Crimson Text',serif;
+  background:#0a0603;color:var(--parch);
+  height:100vh;overflow:hidden;user-select:none;
+}
+/* grain */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════ */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:50px;z-index:200;
+  background:linear-gradient(180deg,rgba(18,5,2,.98) 0%,rgba(18,5,2,.85) 100%);
+  border-bottom:1px solid rgba(233,193,118,.18);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  backdrop-filter:blur(6px);
+}
+.brand{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:.2em;color:var(--gold);text-shadow:0 0 20px var(--glow);}
+.subtitle{font-family:'IM Fell English',serif;font-size:.65rem;color:var(--parch2);letter-spacing:.15em;}
+.top-res{display:flex;gap:14px;align-items:center;}
+.rchip{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(18,5,2,.8);border:1px solid rgba(233,193,118,.18);
+  padding:3px 10px;border-radius:2px;
+  font-family:'Cinzel',serif;font-size:.68rem;color:var(--gold2);
+}
+.rchip .material-symbols-outlined{font-size:1rem;color:var(--gold);}
+.rval{font-weight:700;color:var(--gold);min-width:50px;text-align:right;}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+#layout{display:flex;height:100vh;padding-top:50px;}
+
+/* ─── LEFT SIDEBAR ─── */
+#sidebar{
+  width:272px;min-width:272px;
+  background:var(--panel-bg);
+  border-right:1px solid rgba(233,193,118,.12);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:4px 0 28px rgba(0,0,0,.55);
+}
+.sb-sec{padding:12px 14px 8px;border-bottom:1px solid rgba(233,193,118,.07);}
+.sec-lbl{
+  font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.28em;
+  color:var(--parch2);text-transform:uppercase;margin-bottom:8px;opacity:.65;
+}
+
+/* algo buttons */
+.algo-btn{
+  width:100%;display:flex;align-items:center;gap:9px;
+  padding:8px 10px;margin-bottom:4px;
+  background:transparent;border:1px solid transparent;border-radius:2px;
+  cursor:pointer;transition:all .18s;
+  font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.04em;
+  color:var(--parch);text-align:left;
+}
+.algo-btn:hover{background:rgba(233,193,118,.07);border-color:rgba(233,193,118,.2);color:var(--gold);}
+.algo-btn.active{
+  background:rgba(233,193,118,.11);border-color:rgba(233,193,118,.38);
+  border-left:3px solid var(--gold);color:var(--gold2);
+}
+.aico{width:26px;height:26px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+.abadge{margin-left:auto;font-size:.58rem;padding:2px 5px;border-radius:2px;background:rgba(233,193,118,.13);color:var(--gold);}
+
+/* complexity */
+.cx-box{
+  background:rgba(0,0,0,.3);border:1px solid rgba(233,193,118,.09);
+  border-radius:2px;padding:9px 11px;margin-top:5px;
+}
+.cx-lbl{font-size:.58rem;color:var(--fog);letter-spacing:.1em;margin-bottom:3px;}
+.cx-val{font-family:'Cinzel',serif;font-size:.82rem;color:var(--gold2);}
+.cx-desc{font-size:.68rem;color:var(--fog);margin-top:4px;font-style:italic;line-height:1.4;}
+
+/* info panel */
+#info-panel{padding:10px 14px;flex:1;overflow-y:auto;}
+#info-panel::-webkit-scrollbar{width:3px;}
+#info-panel::-webkit-scrollbar-thumb{background:rgba(233,193,118,.18);border-radius:2px;}
+.tcard{background:rgba(233,193,118,.04);border:1px solid rgba(233,193,118,.13);border-radius:2px;padding:10px;margin-bottom:6px;}
+.tname{font-family:'Cinzel',serif;font-size:.82rem;color:var(--gold2);margin-bottom:5px;}
+.trow{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:2px;}
+.tkey{color:var(--fog);}.tval{color:var(--parch);font-weight:600;}
+
+/* speed */
+.speed-ctrl{display:flex;align-items:center;gap:7px;padding:7px 14px;border-top:1px solid rgba(233,193,118,.07);}
+.speed-ctrl label{font-size:.58rem;color:var(--fog);font-family:'Cinzel',serif;letter-spacing:.1em;white-space:nowrap;}
+input[type=range]{flex:1;accent-color:var(--gold);height:3px;background:rgba(233,193,118,.18);border-radius:2px;outline:none;-webkit-appearance:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:var(--gold);border-radius:50%;cursor:pointer;}
+.spd-val{font-size:.62rem;color:var(--gold);min-width:26px;font-family:'Cinzel',serif;}
+
+/* action btns */
+.act-btn{
+  margin:0 14px 10px;padding:11px;
+  background:linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
+  border:1px solid rgba(233,193,118,.28);border-radius:2px;
+  font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.14em;
+  color:var(--gold2);cursor:pointer;transition:all .18s;text-transform:uppercase;
+  box-shadow:0 3px 16px rgba(123,31,31,.38);
+}
+.act-btn:hover{background:linear-gradient(135deg,var(--imperial2) 0%,var(--imperial) 100%);transform:translateY(-1px);}
+.act-btn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+.act-btn.run{background:linear-gradient(135deg,#1a3a6e 0%,#0f2547 100%);border-color:rgba(100,150,233,.28);box-shadow:0 3px 16px rgba(26,58,110,.38);}
+.act-btn.run:hover{background:linear-gradient(135deg,#1e4a8e 0%,#1a3a6e 100%);}
+.act-btn.reset{background:rgba(233,193,118,.05);border-color:rgba(233,193,118,.13);font-size:.65rem;padding:7px;}
+
+/* ─── MAP AREA ─── */
+#map-area{flex:1;position:relative;overflow:hidden;background:#000;}
+
+/* THE actual Napoleonic map image */
+#map-bg-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;pointer-events:none;
+  opacity:.82;
+}
+
+/* SVG overlay on top of map image */
+#map-svg{position:absolute;inset:0;width:100%;height:100%;z-index:10;}
+
+/* HUD badges on map */
+.map-hud{
+  position:absolute;top:10px;right:10px;z-index:30;
+  display:flex;gap:8px;pointer-events:none;
+}
+.hud-chip{
+  background:rgba(18,5,2,.88);border:1px solid rgba(233,193,118,.22);
+  padding:5px 12px;border-radius:2px;backdrop-filter:blur(4px);
+  font-family:'Cinzel',serif;font-size:.65rem;color:var(--gold2);
+}
+.hud-chip span{color:var(--gold);font-weight:700;}
+.prog-bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--imperial),var(--gold));border-radius:2px;transition:width .4s;}
+
+/* Tooltip */
+#maptip{
+  position:fixed;pointer-events:none;opacity:0;
+  background:rgba(18,5,2,.95);border:1px solid rgba(233,193,118,.3);
+  padding:8px 12px;border-radius:2px;font-family:'Cinzel',serif;font-size:.68rem;
+  color:var(--gold2);z-index:500;transition:opacity .15s;
+  box-shadow:0 4px 18px rgba(0,0,0,.6);min-width:120px;
+}
+.tip-name{font-size:.78rem;color:var(--gold);margin-bottom:4px;}
+.tip-row{font-size:.65rem;color:var(--fog);}
+
+/* ─── RIGHT LOG PANEL ─── */
+#log-area{
+  width:248px;min-width:248px;
+  background:var(--panel-bg);
+  border-left:1px solid rgba(233,193,118,.12);
+  display:flex;flex-direction:column;
+}
+#log-hdr{padding:10px 14px;border-bottom:1px solid rgba(233,193,118,.09);font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.2em;color:var(--parch2);}
+#log-body{flex:1;overflow-y:auto;padding:8px 12px;}
+#log-body::-webkit-scrollbar{width:3px;}
+#log-body::-webkit-scrollbar-thumb{background:rgba(233,193,118,.13);}
+.lentry{border-bottom:1px solid rgba(233,193,118,.05);padding:5px 0;font-size:.7rem;line-height:1.4;animation:fds .28s ease;}
+@keyframes fds{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
+.ltime{color:var(--parch2);font-size:.6rem;display:block;margin-bottom:1px;font-family:'Cinzel',serif;}
+.lentry.victory{color:#8fd870;}.lentry.defeat{color:#e07070;}.lentry.info{color:var(--gold2);}.lentry.algo{color:#8ab4e0;}
+
+/* algo step trace */
+#algo-steps{padding:8px 12px;border-top:1px solid rgba(233,193,118,.09);max-height:145px;overflow-y:auto;}
+#algo-steps::-webkit-scrollbar{width:3px;}
+#algo-steps::-webkit-scrollbar-thumb{background:rgba(100,150,233,.18);}
+.steplbl{font-family:'Cinzel',serif;font-size:.57rem;letter-spacing:.15em;color:var(--steel);margin-bottom:5px;opacity:.8;}
+.step{font-size:.65rem;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(200,200,200,.5);transition:color .18s;}
+.step.cur{color:var(--gold2);font-weight:600;}.step.vis{color:#6a9a5a;}.step.que{color:#8ab4e0;}
+
+/* ═══════════════════════════════════════════
+   SVG MAP ELEMENTS
+═══════════════════════════════════════════ */
+.edge{stroke-width:2;fill:none;stroke-opacity:.55;transition:stroke .3s,stroke-width .3s,stroke-opacity .3s;}
+.edge.frontier{stroke-dasharray:6 4;animation:da 1s linear infinite;}
+@keyframes da{to{stroke-dashoffset:-20;}}
+.edge.active-path{stroke-width:3.5;stroke-opacity:.95;}
+.edge.traversed{stroke-width:2.5;stroke-opacity:.8;}
+
+/* node states — driven by data-state attr */
+circle.ncirc{cursor:pointer;transition:r .18s,fill .35s,stroke .35s,filter .35s;}
+circle.ncirc:hover{filter:drop-shadow(0 0 8px rgba(233,193,118,.7));}
+g[data-state="conquered"] circle.ncirc{fill:#2c4025;stroke:#6a9a5a;stroke-width:2.5;}
+g[data-state="scouted"]   circle.ncirc{fill:#c5a059;stroke:rgba(42,20,5,.6);stroke-width:2;}
+g[data-state="unvisited"] circle.ncirc{fill:rgba(60,40,20,.55);stroke:rgba(233,193,118,.25);stroke-width:1.2;}
+g[data-state="selected"]  circle.ncirc{fill:#7b1f1f;stroke:var(--gold);stroke-width:3;filter:drop-shadow(0 0 12px rgba(233,193,118,.55));}
+g[data-state="enemy"]     circle.ncirc{fill:#5c1010;stroke:#e05050;stroke-width:2;}
+g[data-state="visiting"]  circle.ncirc{fill:#1a3a6e;stroke:#8ab4e0;stroke-width:2.5;filter:drop-shadow(0 0 10px rgba(100,160,230,.6));}
+g[data-state="queued"]    circle.ncirc{fill:#3a2a00;stroke:var(--gold);stroke-width:2;filter:drop-shadow(0 0 8px rgba(233,193,118,.4));}
+g[data-state="greedy"]    circle.ncirc{fill:#5a1a5a;stroke:#c080c0;stroke-width:2.5;filter:drop-shadow(0 0 10px rgba(160,80,160,.5));}
+
+.nlabel{
+  pointer-events:none;
+  font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;
+  text-anchor:middle;fill:#fff;
+  paint-order:stroke;stroke:#000;stroke-width:3px;stroke-linejoin:round;
+  text-shadow:1px 1px 2px rgba(0,0,0,.9);
+}
+.ewt{font-family:'Cinzel',serif;font-size:7.5px;text-anchor:middle;pointer-events:none;fill:rgba(255,255,255,.7);paint-order:stroke;stroke:#000;stroke-width:2px;}
+
+/* pulse for player home */
+@keyframes pulse{0%,100%{r:11;opacity:1;}50%{r:15;opacity:.5;}}
+.pulse-anim{animation:pulse 2s infinite;}
+
+/* ═══════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════ */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(5,2,1,.88);display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(5px);
+}
+.modal{
+  background:linear-gradient(160deg,#1c0907 0%,#120805 100%);
+  border:1px solid rgba(233,193,118,.28);border-radius:4px;
+  padding:36px;max-width:480px;width:90%;
+  box-shadow:0 0 70px rgba(233,193,118,.07),0 40px 70px rgba(0,0,0,.8);
+  text-align:center;position:relative;
+}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.mcrest{font-size:2.6rem;margin-bottom:12px;}
+.mtitle{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:900;color:var(--gold);letter-spacing:.1em;margin-bottom:7px;}
+.msub{font-family:'IM Fell English',serif;font-size:.88rem;color:var(--fog);margin-bottom:20px;line-height:1.6;}
+.mbtn{
+  display:inline-block;padding:11px 28px;margin:5px;
+  background:linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
+  border:1px solid rgba(233,193,118,.28);border-radius:2px;
+  font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.14em;
+  color:var(--gold2);cursor:pointer;transition:all .18s;text-transform:uppercase;
+}
+.mbtn:hover{background:linear-gradient(135deg,var(--imperial2) 0%,var(--imperial) 100%);transform:translateY(-2px);}
+.mbtn.sec{background:rgba(233,193,118,.07);border-color:rgba(233,193,118,.18);}
+
+/* Battle Modal */
+#battle-modal{display:none;}
+.battle-vs{display:flex;justify-content:space-between;align-items:center;margin:18px 0;}
+.bside{text-align:center;}
+.bside-label{font-size:.65rem;letter-spacing:.15em;opacity:.6;margin-bottom:4px;font-family:'Cinzel',serif;}
+.bside-power{font-size:1.8rem;font-weight:700;font-family:'Cinzel',serif;}
+.bblue{color:#60a5fa;}.bred{color:#f87171;}
+.bvs{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--fog);}
+.bresult{min-height:40px;display:flex;align-items:center;justify-content:center;font-family:'IM Fell English',serif;font-size:1.1rem;margin:12px 0;font-style:italic;}
+.bgood{color:#6ee7b7;}.bbad{color:#f87171;}.bneutral{color:var(--fog);}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+#toast{
+  position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-14px);
+  background:rgba(18,5,2,.96);border:1px solid rgba(233,193,118,.28);
+  padding:8px 22px;border-radius:2px;font-family:'Cinzel',serif;font-size:.72rem;
+  color:var(--gold2);z-index:600;opacity:0;transition:opacity .22s,transform .22s;
+  pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.6);letter-spacing:.1em;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ═══════════════════════════════════════════
+   STORY SYSTEM
+═══════════════════════════════════════════ */
+#story-modal{display:none;z-index:450;}
+.story-inner{
+  max-width:570px;width:92%;text-align:left;position:relative;
+  background:linear-gradient(155deg,#1f0d06 0%,#130805 55%,#1a0b07 100%);
+  border:1px solid rgba(233,193,118,.32);
+  box-shadow:0 0 80px rgba(233,193,118,.06),0 0 0 4px rgba(233,193,118,.04),0 40px 80px rgba(0,0,0,.9);
+}
+.story-inner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--gold) 30%,var(--gold2) 50%,var(--gold) 70%,transparent 100%);}
+.story-inner::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(233,193,118,.3),transparent);}
+.story-ornament{font-size:2.8rem;text-align:center;display:block;margin-bottom:5px;filter:drop-shadow(0 0 16px rgba(233,193,118,.4));}
+.story-source{
+  font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.35em;
+  color:var(--parch2);text-transform:uppercase;text-align:center;
+  margin-bottom:14px;opacity:.7;
+}
+.story-divider{
+  height:1px;margin:0 0 18px;
+  background:linear-gradient(90deg,transparent,rgba(233,193,118,.22),transparent);
+}
+.story-title{
+  font-family:'Cinzel',serif;font-size:1.32rem;font-weight:900;
+  color:var(--gold);letter-spacing:.06em;margin-bottom:14px;text-align:center;
+  text-shadow:0 0 30px rgba(233,193,118,.25);
+}
+.story-body{
+  font-family:'IM Fell English',serif;font-size:.98rem;
+  color:var(--parch);line-height:1.82;margin:0 0 24px;font-style:italic;
+  border-left:2px solid rgba(233,193,118,.12);padding-left:14px;
+}
+.story-body em{color:var(--gold2);font-style:normal;}
+.story-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.story-choice{
+  width:100%;text-align:left;padding:12px 16px;
+  background:rgba(233,193,118,.04);
+  border:1px solid rgba(233,193,118,.16);border-radius:2px;
+  cursor:pointer;transition:all .18s;
+  font-family:'Crimson Text',serif;
+}
+.story-choice:hover{
+  background:rgba(233,193,118,.09);
+  border-color:rgba(233,193,118,.38);
+  transform:translateX(4px);
+}
+.sc-label{
+  font-family:'Cinzel',serif;font-size:.75rem;color:var(--gold2);
+  margin-bottom:3px;letter-spacing:.04em;
+}
+.sc-sub{font-size:.78rem;color:var(--fog);font-style:italic;}
+.story-consequence{
+  background:linear-gradient(135deg,rgba(233,193,118,.07),rgba(233,193,118,.03));
+  border:1px solid rgba(233,193,118,.2);border-left:3px solid var(--gold);
+  border-radius:0 2px 2px 0;padding:13px 16px;
+  font-family:'IM Fell English',serif;font-size:.92rem;
+  color:var(--gold2);font-style:italic;line-height:1.6;margin-bottom:16px;
+  display:none;
+}
+.story-continue{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
+  border:1px solid rgba(233,193,118,.28);border-radius:2px;
+  font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.14em;
+  color:var(--gold2);cursor:pointer;transition:all .18s;text-transform:uppercase;
+  display:none;
+}
+.story-continue:hover{background:linear-gradient(135deg,var(--imperial2),var(--imperial));transform:translateY(-1px);}
+
+/* chapter tracker */
+#chapter-hud{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.2em;
+  color:rgba(233,193,118,.4);pointer-events:none;z-index:25;
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+<!-- TOOLTIP -->
+<div id="maptip"><div class="tip-name" id="tip-name">—</div><div class="tip-row" id="tip-row1"></div><div class="tip-row" id="tip-row2"></div></div>
+
+<!-- ════ INTRO MODAL ════ -->
+<div class="modal-backdrop" id="intro-modal">
+  <div class="modal">
+    <div class="mcrest">⚜</div>
+    <div class="mtitle">Crown &amp; Conquest</div>
+    <div class="msub">
+      A DAA-Based Strategy Simulation<br/>
+      <em>Team Algorithmic Empire · DAA-IV-T241</em><br/><br/>
+      Europe as a graph. Algorithms as strategy.<br/>
+      Conquer the continent — step by step.
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;">
+      <div style="padding:7px 13px;background:rgba(233,193,118,.05);border:1px solid rgba(233,193,118,.13);border-radius:2px;font-size:.67rem;color:var(--parch);text-align:center;">
+        <div style="font-family:'Cinzel',serif;color:var(--gold);margin-bottom:3px;">Nodes</div>15 Territories
+      </div>
+      <div style="padding:7px 13px;background:rgba(233,193,118,.05);border:1px solid rgba(233,193,118,.13);border-radius:2px;font-size:.67rem;color:var(--parch);text-align:center;">
+        <div style="font-family:'Cinzel',serif;color:var(--gold);margin-bottom:3px;">Edges</div>Weighted Borders
+      </div>
+      <div style="padding:7px 13px;background:rgba(233,193,118,.05);border:1px solid rgba(233,193,118,.13);border-radius:2px;font-size:.67rem;color:var(--parch);text-align:center;">
+        <div style="font-family:'Cinzel',serif;color:var(--gold);margin-bottom:3px;">Algorithms</div>BFS·DFS·Dijkstra·Greedy
+      </div>
+    </div>
+    <button class="mbtn" onclick="startGame()">Begin Campaign</button>
+  </div>
+</div>
+
+<!-- ════ BATTLE MODAL ════ -->
+<div class="modal-backdrop" id="battle-modal">
+  <div class="modal">
+    <div class="mcrest">⚔</div>
+    <div class="mtitle">Battle for <span id="btl-name">Vienna</span></div>
+    <div class="battle-vs">
+      <div class="bside"><div class="bside-label">Grande Armée</div><div class="bside-power bblue" id="btl-atk">—</div></div>
+      <div class="bvs">VS</div>
+      <div class="bside"><div class="bside-label">Defenders</div><div class="bside-power bred" id="btl-def">—</div></div>
+    </div>
+    <div class="bresult bneutral" id="btl-result">The fate of Europe hangs in the balance.</div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="mbtn sec" id="btl-retreat">Retreat</button>
+      <button class="mbtn" id="btl-advance" style="flex:1;">Advance!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ WIN MODAL ════ -->
+<div class="modal-backdrop" id="win-modal" style="display:none;">
+  <div class="modal">
+    <div class="mcrest">👑</div>
+    <div class="mtitle">Europe Conquered!</div>
+    <div class="msub" id="win-stats">The Grande Armée stands victorious.</div>
+    <button class="mbtn" onclick="resetGame();document.getElementById('win-modal').style.display='none'">New Campaign</button>
+  </div>
+</div>
+
+<!-- ════ STORY MODAL ════ -->
+<div class="modal-backdrop" id="story-modal">
+  <div class="modal story-inner">
+    <div class="story-ornament" id="story-ornament">⚜</div>
+    <div class="story-source" id="story-source">Imperial Dispatch — 1805</div>
+    <div class="story-divider"></div>
+    <div class="story-title" id="story-title">—</div>
+    <div class="story-body" id="story-body"></div>
+    <div class="story-choices" id="story-choices"></div>
+    <div class="story-consequence" id="story-consequence"></div>
+    <button class="story-continue" id="story-continue" onclick="Story.close()">Continue Campaign ▶</button>
+  </div>
+</div>
+
+<!-- ════ TOP BAR ════ -->
+<div id="topbar">
+  <div><div class="brand">Crown &amp; Conquest</div><div class="subtitle">GRANDE ARMÉE — ALGORITHMIC CAMPAIGN · 1805</div></div>
+  <div class="top-res">
+    <div class="rchip"><span class="material-symbols-outlined">groups</span> Army <span class="rval" id="r-army">50,000</span></div>
+    <div class="rchip"><span class="material-symbols-outlined">payments</span> Gold <span class="rval" id="r-gold">1,200</span></div>
+    <div class="rchip"><span class="material-symbols-outlined">verified_user</span> Morale <span class="rval" id="r-morale">85%</span></div>
+    <div class="rchip"><span class="material-symbols-outlined">calendar_today</span> Turn <span class="rval" id="r-turn">1</span></div>
+  </div>
+</div>
+
+<!-- ════ MAIN LAYOUT ════ -->
+<div id="layout">
+
+  <!-- ── LEFT SIDEBAR ── -->
+  <div id="sidebar">
+
+    <!-- Algo Selection -->
+    <div class="sb-sec">
+      <div class="sec-lbl">Strategic Doctrine</div>
+      <button class="algo-btn" id="btn-bfs"      onclick="selectAlgo('BFS')">
+        <div class="aico" style="background:rgba(58,150,100,.18);color:#7ab870;">🌊</div>
+        <div><div style="font-size:.73rem;">Frontal Assault</div><div style="font-size:.58rem;opacity:.55;margin-top:1px;">Breadth-First Search</div></div>
+        <span class="abadge">BFS</span>
+      </button>
+      <button class="algo-btn" id="btn-dfs"      onclick="selectAlgo('DFS')">
+        <div class="aico" style="background:rgba(100,60,160,.18);color:#a080d0;">🗡</div>
+        <div><div style="font-size:.73rem;">Deep Infiltration</div><div style="font-size:.58rem;opacity:.55;margin-top:1px;">Depth-First Search</div></div>
+        <span class="abadge">DFS</span>
+      </button>
+      <button class="algo-btn active" id="btn-dijkstra" onclick="selectAlgo('Dijkstra')">
+        <div class="aico" style="background:rgba(26,58,110,.28);color:#8ab4e0;">⚡</div>
+        <div><div style="font-size:.73rem;">Optimal Route</div><div style="font-size:.58rem;opacity:.55;margin-top:1px;">Dijkstra's Algorithm</div></div>
+        <span class="abadge">O((V+E)logV)</span>
+      </button>
+      <button class="algo-btn" id="btn-greedy"   onclick="selectAlgo('Greedy')">
+        <div class="aico" style="background:rgba(150,80,20,.22);color:#e0a060;">⚜</div>
+        <div><div style="font-size:.73rem;">Imperial Greed</div><div style="font-size:.58rem;opacity:.55;margin-top:1px;">Greedy Resource Alloc.</div></div>
+        <span class="abadge">Greedy</span>
+      </button>
+    </div>
+
+    <!-- Complexity -->
+    <div class="sb-sec">
+      <div class="sec-lbl">Complexity Analysis</div>
+      <div class="cx-box">
+        <div class="cx-lbl">TIME COMPLEXITY</div>
+        <div class="cx-val" id="cx-time">O((V+E) log V)</div>
+        <div class="cx-lbl" style="margin-top:7px;">SPACE COMPLEXITY</div>
+        <div class="cx-val" id="cx-space">O(V)</div>
+        <div class="cx-desc" id="cx-desc">Uses a min-heap priority queue. Finds globally optimal shortest paths from source to all vertices. Requires non-negative edge weights.</div>
+      </div>
+    </div>
+
+    <!-- Territory info -->
+    <div id="info-panel">
+      <div class="sec-lbl">Selected Territory</div>
+      <div id="tinfo"><div style="color:var(--fog);font-size:.72rem;font-style:italic;">Click a territory on the map to inspect it.</div></div>
+    </div>
+
+    <!-- Speed -->
+    <div class="speed-ctrl">
+      <label>SPEED</label>
+      <input type="range" id="spd" min="150" max="1600" value="750" step="100" oninput="setSpeed(this.value)"/>
+      <span class="spd-val" id="spd-lbl">1x</span>
+    </div>
+
+    <!-- Actions -->
+    <button class="act-btn run" id="run-btn"     onclick="runAlgorithm()">▶ Run Algorithm</button>
+    <button class="act-btn"    id="conq-btn"     onclick="conquerSelected()" disabled>⚔ Conquer Territory</button>
+    <button class="act-btn"    id="turn-btn"     onclick="endTurn()">⏭ End Turn (+Gold)</button>
+    <button class="act-btn reset"                onclick="resetGame()">↺ Reset Campaign</button>
+  </div>
+
+  <!-- ── MAP ── -->
+  <div id="map-area">
+    <!-- The Napoleonic map image from c_c_2 -->
+    <img id="map-bg-img"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiRJOXm8KreCSMxoCsMCdJovSI1cKnKpwvWktTwuuwL99O99yyOOp9fDy7SYYwPlbst9dSzNnJZwGvv-VjinvPG9mfche-01By405NSzhewloGx5P30S7v6W2Yh_gxHjNEgLG-MvEDzNEhBvfv8V-5rFgyJOEyZcLb_MGsd1Irnv9c246zBUYyu8OGgXeY64We6rzUCXTGwE2hYv7mqQZTRjveyGeC3DsFbFa32Q0zGLlGLWUYqPuysdYhOkq5K1-rUmtFwNEsrnQ"
+      alt="Napoleonic Europe Map"/>
+
+    <!-- SVG graph overlay -->
+    <svg id="map-svg" viewBox="0 0 1000 800">
+      <g id="edge-layer"></g>
+      <g id="node-layer"></g>
+    </svg>
+
+    <!-- HUD -->
+    <div class="map-hud">
+      <div class="hud-chip">Territories <span id="hud-terr">1/15</span>
+        <div class="prog-bar"><div class="prog-fill" id="hud-prog" style="width:6.6%"></div></div>
+      </div>
+      <div class="hud-chip">Algorithm <span id="hud-algo">Dijkstra</span></div>
+    </div>
+    <div id="chapter-hud" id="chapter-hud">⚜ CHAPTER I — THE EAGLE AWAKENS</div>
+  </div>
+
+  <!-- ── RIGHT LOG ── -->
+  <div id="log-area">
+    <div id="log-hdr">⚜ BATTLE CHRONICLE</div>
+    <div id="log-body"></div>
+    <div id="algo-steps">
+      <div class="steplbl">ALGORITHM TRACE</div>
+      <div id="step-list"></div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA  — 15 cities from c_c_2 + weights + conquest data
+// ═══════════════════════════════════════════════════════════
+// Coordinates mapped to viewBox 0 0 1000 800
+// (c_c_2 used ~960×780 implicitly from image)
+const T = [
+  {id:0,  name:"Paris",      x:155, y:358, type:"capital", status:"conquered", owner:"player", units:5000, gold:0,    cost:0,  neighbors:[1,2,12]},
+  {id:1,  name:"London",     x:125, y:225, type:"city",    status:"unvisited", owner:"neutral",units:3000, gold:400,  cost:4,  neighbors:[0,2]},
+  {id:2,  name:"Brussels",   x:228, y:324, type:"fort",    status:"scouted",   owner:"neutral",units:2000, gold:350,  cost:3,  neighbors:[0,1,3,5]},
+  {id:3,  name:"Amsterdam",  x:258, y:272, type:"city",    status:"scouted",   owner:"neutral",units:2500, gold:480,  cost:4,  neighbors:[2,4,5]},
+  {id:4,  name:"Copenhagen", x:410, y:155, type:"city",    status:"unvisited", owner:"neutral",units:2000, gold:300,  cost:5,  neighbors:[3,5]},
+  {id:5,  name:"Berlin",     x:460, y:284, type:"capital", status:"unvisited", owner:"enemy",  units:4500, gold:900,  cost:9,  neighbors:[2,3,4,6,13]},
+  {id:6,  name:"Prague",     x:488, y:366, type:"city",    status:"unvisited", owner:"neutral",units:2000, gold:380,  cost:5,  neighbors:[5,7,8,13]},
+  {id:7,  name:"Munich",     x:408, y:415, type:"fort",    status:"unvisited", owner:"neutral",units:1500, gold:420,  cost:4,  neighbors:[6,8,9]},
+  {id:8,  name:"Vienna",     x:558, y:428, type:"capital", status:"unvisited", owner:"enemy",  units:4000, gold:1100, cost:10, neighbors:[6,7,13]},
+  {id:9,  name:"Milan",      x:360, y:528, type:"city",    status:"unvisited", owner:"neutral",units:2200, gold:650,  cost:5,  neighbors:[7,10,12]},
+  {id:10, name:"Rome",       x:428, y:655, type:"city",    status:"unvisited", owner:"neutral",units:3000, gold:700,  cost:6,  neighbors:[9,11]},
+  {id:11, name:"Naples",     x:505, y:758, type:"fort",    status:"unvisited", owner:"neutral",units:1800, gold:500,  cost:4,  neighbors:[10]},
+  {id:12, name:"Madrid",     x:105, y:688, type:"city",    status:"unvisited", owner:"neutral",units:4000, gold:600,  cost:6,  neighbors:[0,9]},
+  {id:13, name:"Warsaw",     x:658, y:256, type:"capital", status:"unvisited", owner:"enemy",  units:3500, gold:850,  cost:9,  neighbors:[5,6,8,14]},
+  {id:14, name:"Moscow",     x:905, y:185, type:"capital", status:"unvisited", owner:"enemy",  units:6000, gold:1500, cost:14, neighbors:[13]},
+];
+
+const EDGES=[
+  [0,1,4],[0,2,3],[0,12,6],
+  [1,2,2],
+  [2,3,2],[2,5,5],
+  [3,4,3],[3,5,4],
+  [4,5,4],
+  [5,6,3],[5,13,5],
+  [6,7,3],[6,8,4],[6,13,4],
+  [7,8,4],[7,9,4],
+  [8,13,3],
+  [9,10,3],[9,12,5],
+  [10,11,3],
+  [13,14,6],
+];
+
+const ALGO_META={
+  BFS:     {time:'O(V + E)',        space:'O(V)',  desc:'Explores level by level using a queue. Guarantees shortest hop-count path in unweighted graphs. Excellent for territory scouting and reachability.'},
+  DFS:     {time:'O(V + E)',        space:'O(V)',  desc:'Dives deep along one path before backtracking. Uses a stack (or recursion). Detects cycles and explores connectivity.'},
+  Dijkstra:{time:'O((V+E) log V)',  space:'O(V)',  desc:'Uses a min-heap priority queue. Finds globally optimal shortest paths from source to all vertices. Requires non-negative edge weights.'},
+  Greedy:  {time:'O(n log n)',      space:'O(n)',  desc:'Selects the locally optimal choice each step — highest gold/cost ratio. Fast but not always globally optimal (no backtracking).'},
+};
+
+// ── Game State ──
+let res={army:50000,gold:1200,morale:85,turn:1};
+let algo='Dijkstra', selId=null, running=false, abortFlag=false, animMs=750;
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+function startGame(){
+  document.getElementById('intro-modal').style.display='none';
+  renderMap();
+  log('Campaign initiated. The Emperor awaits victory.','info');
+  log('Paris is under Imperial control.','victory');
+  updateRes();
+}
+
+function resetGame(){
+  T.forEach((t,i)=>{
+    t.status = i===0?'conquered':i<=3?'scouted':'unvisited';
+    t.owner  = i===0?'player':([5,8,13,14].includes(i)?'enemy':'neutral');
+    t.units  = [5000,3000,2000,2500,2000,4500,2000,1500,4000,2200,3000,1800,4000,3500,6000][i];
+  });
+  res={army:50000,gold:1200,morale:85,turn:1};
+  selId=null;running=false;abortFlag=true;
+  document.getElementById('step-list').innerHTML='';
+  document.getElementById('tinfo').innerHTML='<div style="color:var(--fog);font-size:.72rem;font-style:italic;">Click a territory on the map to inspect it.</div>';
+  document.getElementById('conq-btn').disabled=true;
+  updateRes();renderMap();
+  log('Campaign reset. Returning to Paris.','info');
+  Story.reset();
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER MAP
+// ═══════════════════════════════════════════════════════════
+function edgeW(a,b){const e=EDGES.find(e=>(e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a));return e?e[2]:1;}
+
+function renderMap(){
+  const EL=document.getElementById('edge-layer');
+  const NL=document.getElementById('node-layer');
+  EL.innerHTML='';NL.innerHTML='';
+
+  const drawn=new Set();
+  EDGES.forEach(([a,b,w])=>{
+    const key=`${Math.min(a,b)}-${Math.max(a,b)}`;
+    if(drawn.has(key))return;drawn.add(key);
+    const ta=T[a],tb=T[b];
+    const line=svgEl('line',{x1:ta.x,y1:ta.y,x2:tb.x,y2:tb.y,
+      stroke:'#ffffff',class:'edge','data-edge':key});
+    EL.appendChild(line);
+    // weight label
+    const mx=(ta.x+tb.x)/2,my=(ta.y+tb.y)/2;
+    const wt=svgEl('text',{x:mx,y:my-5,class:'ewt','data-wt':key});
+    wt.textContent=w;EL.appendChild(wt);
+  });
+
+  T.forEach(t=>{
+    const g=svgEl('g',{id:`n${t.id}`,'data-state':t.status,transform:`translate(${t.x},${t.y})`});
+    const r=t.type==='capital'?13:t.type==='fort'?10:9;
+    const c=svgEl('circle',{class:'ncirc',cx:0,cy:0,r});
+    if(t.id===0&&t.status==='conquered')c.classList.add('pulse-anim');
+    // icon text
+    const ic=svgEl('text',{x:0,y:1,'text-anchor':'middle','dominant-baseline':'middle',
+      'pointer-events':'none','font-size':t.type==='capital'?'11':'9',fill:'#fff','opacity':'.85'});
+    ic.textContent=t.type==='capital'?'♚':t.type==='fort'?'⚔':'⚑';
+    // label
+    const lb=svgEl('text',{class:'nlabel',x:0,y:r+13});
+    lb.textContent=t.name;
+    g.appendChild(c);g.appendChild(ic);g.appendChild(lb);
+    g.addEventListener('click',()=>selectT(t.id));
+    g.addEventListener('mouseenter',e=>showTip(t,e));
+    g.addEventListener('mouseleave',hideTip);
+    NL.appendChild(g);
+  });
+}
+
+function svgEl(tag,attrs={}){
+  const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));
+  return el;
+}
+
+function setNS(id,state){
+  const g=document.getElementById(`n${id}`);
+  if(g)g.setAttribute('data-state',state);
+}
+
+function setEdgeCls(a,b,cls){
+  const key=`${Math.min(a,b)}-${Math.max(a,b)}`;
+  const line=document.querySelector(`[data-edge="${key}"]`);
+  if(line){
+    const col=cls==='active-path'?'#e9c176':cls==='traversed'?'#7ab870':cls==='frontier'?'#8ab4e0':'#ffffff';
+    line.setAttribute('stroke',col);
+    line.className.baseVal=`edge ${cls}`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SELECTION
+// ═══════════════════════════════════════════════════════════
+function selectT(id){
+  if(running)return;
+  if(selId!==null) setNS(selId,T[selId].status);
+  selId=id;
+  setNS(id,'selected');
+  const t=T[id];
+  const canConq=t.status==='scouted'&&res.army>=t.cost*500&&res.gold>=t.cost*50;
+  const canAtk =t.status==='unvisited'&&t.owner==='enemy'&&
+    T.some(nt=>nt.owner==='player'&&nt.neighbors.includes(id));
+  document.getElementById('conq-btn').disabled=!(canConq||canAtk);
+  document.getElementById('conq-btn').textContent=canAtk?'⚔ Battle!':'⚔ Conquer Territory';
+
+  const owned=t.owner==='player'?'Imperial':'enemy'===t.owner?'Enemy':'Neutral';
+  document.getElementById('tinfo').innerHTML=`
+    <div class="tcard">
+      <div class="tname">${t.type==='capital'?'♚ ':t.type==='fort'?'⚔ ':'⚑ '}${t.name}</div>
+      <div class="trow"><span class="tkey">Status</span><span class="tval" style="color:${stColor(t.status)}">${t.status.toUpperCase()}</span></div>
+      <div class="trow"><span class="tkey">Owner</span><span class="tval">${owned}</span></div>
+      <div class="trow"><span class="tkey">Garrison</span><span class="tval">${t.units.toLocaleString()}</span></div>
+      <div class="trow"><span class="tkey">Gold Reward</span><span class="tval">+${t.gold.toLocaleString()}</span></div>
+      <div class="trow"><span class="tkey">Conquest Cost</span><span class="tval">${t.cost*50} gold · ${t.cost*500} troops</span></div>
+      <div class="trow"><span class="tkey">Borders</span><span class="tval">${t.neighbors.map(n=>T[n].name).join(', ')}</span></div>
+    </div>
+    ${t.status==='unvisited'&&t.owner!=='enemy'?'<div style="font-size:.68rem;color:var(--fog);font-style:italic;">Run an algorithm to establish supply lines first.</div>':''}
+  `;
+  // scouting a key city can trigger story events
+  setTimeout(()=>Story.check(), 300);
+}
+function stColor(s){return s==='conquered'?'#7ab870':s==='scouted'?'#e9c176':'#9e9080';}
+
+// ═══════════════════════════════════════════════════════════
+// ALGORITHM SELECTION
+// ═══════════════════════════════════════════════════════════
+function selectAlgo(a){
+  algo=a;
+  document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`btn-${a.toLowerCase()}`).classList.add('active');
+  const m=ALGO_META[a];
+  document.getElementById('cx-time').textContent=m.time;
+  document.getElementById('cx-space').textContent=m.space;
+  document.getElementById('cx-desc').textContent=m.desc;
+  document.getElementById('hud-algo').textContent=a;
+  log(`Doctrine changed: ${a} strategy selected.`,'algo');
+  document.getElementById('step-list').innerHTML='';
+}
+
+function setSpeed(v){
+  animMs=parseInt(v);
+  const x=(1600-animMs)/1450;
+  document.getElementById('spd-lbl').textContent=x<.25?'0.5x':x<.45?'1x':x<.65?'2x':x<.82?'3x':'4x';
+}
+
+// ═══════════════════════════════════════════════════════════
+// RUN
+// ═══════════════════════════════════════════════════════════
+async function runAlgorithm(){
+  if(running){abortFlag=true;running=false;document.getElementById('run-btn').textContent='▶ Run Algorithm';return;}
+  // reset visuals
+  T.forEach(t=>{if(t.id!==selId)setNS(t.id,t.status);});
+  document.querySelectorAll('.edge').forEach(e=>{e.className.baseVal='edge';e.setAttribute('stroke','#ffffff');});
+  running=true;abortFlag=false;
+  document.getElementById('run-btn').textContent='⏹ Stop';
+  document.getElementById('step-list').innerHTML='';
+  log(`Running ${algo} from Paris…`,'algo');
+  try{
+    if(algo==='BFS') await runBFS(0);
+    else if(algo==='DFS') await runDFS(0);
+    else if(algo==='Dijkstra') await runDijkstra(0);
+    else await runGreedy();
+  }catch(e){}
+  running=false;
+  document.getElementById('run-btn').textContent='▶ Run Algorithm';
+}
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ── BFS ────────────────────────────────────────────────────
+async function runBFS(start){
+  const vis=new Set([start]);
+  const q=[start];
+  addStep('Queue: [Paris]','cur');
+  while(q.length&&!abortFlag){
+    const u=q.shift();
+    const t=T[u];
+    if(u!==selId)setNS(u,'visiting');
+    addStep(`Visit: ${t.name}`,'cur');
+    log(`BFS visiting ${t.name}`,'algo');
+    for(const v of t.neighbors){
+      if(!vis.has(v)){
+        vis.add(v);q.push(v);
+        if(T[v].status==='unvisited'){T[v].status='scouted';setNS(v,'queued');}
+        setEdgeCls(u,v,'frontier');
+        addStep(`  → Queue: ${T[v].name}`,'que');
+      }
+    }
+    await sleep(animMs);if(abortFlag)break;
+    if(t.status!=='conquered'&&u!==selId)setNS(u,t.status);
+    markVis();
+  }
+  if(!abortFlag){addStep('BFS Complete ✓','cur');log(`BFS done. ${vis.size} territories explored.`,'victory');toast(`BFS explored ${vis.size} territories`);renderMap();if(selId)setNS(selId,'selected');}
+}
+
+// ── DFS ────────────────────────────────────────────────────
+async function runDFS(start){
+  const vis=new Set();
+  addStep('Stack: [Paris]','cur');
+  async function dfs(u){
+    if(abortFlag||vis.has(u))return;
+    vis.add(u);const t=T[u];
+    if(u!==selId)setNS(u,'visiting');
+    addStep(`Visit: ${t.name} (depth ${vis.size})`,'cur');
+    log(`DFS → ${t.name}`,'algo');
+    await sleep(animMs);if(abortFlag)return;
+    for(const v of t.neighbors){
+      if(!vis.has(v)){
+        if(T[v].status==='unvisited'){T[v].status='scouted';setEdgeCls(u,v,'frontier');}
+        setNS(v,'queued');addStep(`  Push: ${T[v].name}`,'que');
+        await dfs(v);if(abortFlag)return;
+      }
+    }
+    if(t.status!=='conquered'&&u!==selId)setNS(u,t.status);markVis();
+  }
+  await dfs(start);
+  if(!abortFlag){addStep('DFS Complete ✓','cur');log(`DFS done. ${vis.size} nodes traversed.`,'victory');toast(`DFS traversed ${vis.size} territories`);renderMap();if(selId)setNS(selId,'selected');}
+}
+
+// ── DIJKSTRA ───────────────────────────────────────────────
+async function runDijkstra(start){
+  const dist={},prev={};
+  T.forEach(t=>{dist[t.id]=Infinity;prev[t.id]=null;});
+  dist[start]=0;
+  const pq=[{id:start,d:0}];
+  const vis=new Set();
+  addStep('Init: dist[Paris]=0','cur');
+  while(pq.length&&!abortFlag){
+    pq.sort((a,b)=>a.d-b.d);
+    const {id:u}=pq.shift();
+    if(vis.has(u))continue;vis.add(u);
+    const t=T[u];
+    if(u!==selId)setNS(u,'visiting');
+    addStep(`Process: ${t.name} (d=${dist[u]})`,'cur');
+    log(`Dijkstra: ${t.name} dist=${dist[u]}`,'algo');
+    for(const v of t.neighbors){
+      const w=edgeW(u,v),nd=dist[u]+w;
+      if(nd<dist[v]){
+        dist[v]=nd;prev[v]=u;pq.push({id:v,d:nd});
+        setEdgeCls(u,v,'frontier');
+        if(T[v].status==='unvisited'){T[v].status='scouted';setNS(v,'queued');}
+        addStep(`  Relax: ${T[v].name}=${nd}`,'que');
+      }
+    }
+    await sleep(animMs);if(abortFlag)break;
+    if(t.status!=='conquered'&&u!==selId)setNS(u,t.status);markVis(`${t.name}(${dist[u]})`);
+  }
+  if(!abortFlag){
+    renderMap();
+    T.forEach(t=>{let n=t.id;while(prev[n]!==null){setEdgeCls(prev[n],n,'active-path');n=prev[n];}});
+    addStep('Dijkstra Complete ✓','cur');
+    log(`Dijkstra done. Optimal paths to ${vis.size} territories found.`,'victory');
+    toast('Shortest paths computed!');
+    if(selId)setNS(selId,'selected');
+  }
+}
+
+// ── GREEDY ────────────────────────────────────────────────
+async function runGreedy(){
+  addStep('Rank by gold/cost ratio','cur');
+  log('Greedy: maximise gold per cost unit.','algo');
+  let turns=0;
+  while(turns<10&&!abortFlag){
+    turns++;
+    const cands=T.filter(t=>t.status==='scouted'&&t.owner!=='player');
+    if(!cands.length)break;
+    cands.sort((a,b)=>(b.gold/b.cost)-(a.gold/a.cost));
+    const best=cands[0];
+    setNS(best.id,'greedy');
+    addStep(`Turn ${turns}: ${best.name} (ratio=${(best.gold/best.cost).toFixed(0)})`,'cur');
+    log(`Greedy selects ${best.name} (ratio=${(best.gold/best.cost).toFixed(1)})`,'algo');
+    await sleep(animMs);if(abortFlag)break;
+    const cg=best.cost*50,ca=best.cost*500;
+    if(res.gold<cg||res.army<ca){addStep(`  ✗ Insufficient resources`,'que');log(`Not enough resources for ${best.name}.`,'defeat');break;}
+    res.gold-=cg;res.army-=ca;res.gold+=best.gold;res.morale=Math.min(100,res.morale+3);
+    best.status='conquered';best.owner='player';
+    best.neighbors.forEach(nid=>{if(T[nid].status==='unvisited'){T[nid].status='scouted';setEdgeCls(best.id,nid,'frontier');}});
+    setNS(best.id,'conquered');
+    addStep(`  ✓ Conquered ${best.name} (+${best.gold}g)`,'vis');
+    log(`Greedy conquered ${best.name}! +${best.gold} gold.`,'victory');
+    updateRes();await sleep(animMs/2);
+    renderMap();if(selId)setNS(selId,'selected');
+  }
+  if(!abortFlag){addStep('Greedy pass complete ✓','cur');log('Greedy allocation pass complete.','victory');toast('Greedy strategy executed!');renderMap();if(selId)setNS(selId,'selected');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONQUER / BATTLE
+// ═══════════════════════════════════════════════════════════
+function conquerSelected(){
+  if(selId===null)return;
+  const t=T[selId];
+  if(t.owner==='enemy'||t.status==='unvisited'){openBattle(t);return;}
+  if(t.status!=='scouted'){toast('Territory not scouted!');return;}
+  const cg=t.cost*50,ca=t.cost*500;
+  if(res.gold<cg||res.army<ca){toast('Insufficient resources!');log(`Failed to conquer ${t.name}.`,'defeat');return;}
+  res.gold-=cg;res.army-=ca;res.gold+=t.gold;res.morale=Math.min(100,res.morale+2);
+  t.status='conquered';t.owner='player';
+  t.neighbors.forEach(nid=>{if(T[nid].status==='unvisited')T[nid].status='scouted';});
+  log(`Victory! ${t.name} has fallen to the Grande Armée.`,'victory');
+  toast(`${t.name} conquered!`);updateRes();renderMap();setNS(selId,'selected');
+  document.getElementById('conq-btn').disabled=true;
+  checkWin();
+  setTimeout(()=>Story.check(), 600);
+}
+
+function openBattle(t){
+  const playerNeighbor=T.find(nt=>nt.owner==='player'&&nt.neighbors.includes(t.id));
+  if(!playerNeighbor&&t.status==='unvisited'){toast('No supply line — run an algorithm first!');return;}
+  const atkPow=Math.floor((playerNeighbor?playerNeighbor.units:res.army)*0.6);
+  document.getElementById('btl-name').textContent=t.name;
+  document.getElementById('btl-atk').textContent=atkPow.toLocaleString();
+  document.getElementById('btl-def').textContent=t.units.toLocaleString();
+  document.getElementById('btl-result').textContent='The fate of Europe hangs in the balance.';
+  document.getElementById('btl-result').className='bresult bneutral';
+  const modal=document.getElementById('battle-modal');
+  modal.style.display='flex';
+  const advBtn=document.getElementById('btl-advance');
+  advBtn.disabled=false;
+  advBtn.onclick=()=>{
+    const winChance=atkPow/(atkPow+t.units);
+    const roll=Math.random();
+    advBtn.disabled=true;
+    if(roll<winChance){
+      document.getElementById('btl-result').textContent='VICTORY! The territory is ours.';
+      document.getElementById('btl-result').className='bresult bgood';
+      t.owner='player';t.status='conquered';
+      if(playerNeighbor)playerNeighbor.units=Math.floor(playerNeighbor.units*.7);
+      t.units=Math.floor(atkPow*.5);
+      res.morale=Math.min(100,res.morale+5);
+      res.gold+=t.gold;
+      t.neighbors.forEach(nid=>{if(T[nid].status==='unvisited')T[nid].status='scouted';});
+      log(`The Grande Armée captured ${t.name}!`,'victory');
+    }else{
+      document.getElementById('btl-result').textContent='DEFEAT! We are forced back.';
+      document.getElementById('btl-result').className='bresult bbad';
+      if(playerNeighbor)playerNeighbor.units=Math.floor(playerNeighbor.units*.4);
+      t.units=Math.floor(t.units*.8);
+      res.morale=Math.max(0,res.morale-10);
+      log(`Offensive on ${t.name} repelled with heavy losses.`,'defeat');
+    }
+    setTimeout(()=>{
+      modal.style.display='none';
+      updateRes();renderMap();
+      if(selId)setNS(selId,'selected');
+      checkWin();
+      Story.check();
+    },1600);
+  };
+}
+
+document.getElementById('btl-retreat').onclick=()=>document.getElementById('battle-modal').style.display='none';
+
+function endTurn(){
+  res.turn++;
+  const playerCities=T.filter(t=>t.owner==='player').length;
+  res.gold+=playerCities*100;
+  res.army+=3000;
+  T.filter(t=>t.owner==='enemy').forEach(t=>t.units+=300);
+  log(`Turn ${res.turn} begins. Tax: +${playerCities*100} gold.`,'info');
+  updateRes();if(selId)selectT(selId);
+  setTimeout(()=>Story.check(), 400);
+}
+
+function checkWin(){
+  const allOwned=T.every(t=>t.owner==='player');
+  if(allOwned){
+    const path = Story.getPath();
+    let flavour = 'The Grande Armée stands victorious. All of Europe bows before the Imperial Eagle.';
+    if(path.includes('moscow_march'))
+      flavour = 'Against all warnings, you marched into Moscow — and Moscow burned in your wake. The Tsar sued for peace on your terms. History will argue for centuries whether you were genius or madman.';
+    else if(path.includes('warsaw_peace'))
+      flavour = 'You stopped at Warsaw, offered peace, and the continent accepted. Perhaps the wisest conqueror is the one who knows when to sheathe the sword.';
+    else if(path.includes('dynastic'))
+      flavour = 'The Bonaparte dynasty now sits astride two imperial thrones. Your children will rule what your armies won. This is victory of a deeper kind.';
+    else if(path.includes('pax_napoleon'))
+      flavour = 'The Pax Napoleon holds. You are not merely an emperor — you are the architect of a new European order. The old kings play the game by your rules now.';
+    else if(path.includes('aggressive') && path.includes('decisive'))
+      flavour = 'You fought like a blade with no handle — cutting everything, including those who held it. Europe is conquered. What happens when there is nothing left to conquer?';
+    document.getElementById('win-stats').innerHTML=
+      `${flavour}<br/><br/>
+      Army: ${res.army.toLocaleString()} · Gold: ${res.gold.toLocaleString()} · Morale: ${res.morale}%<br/>
+      Completed in <strong>${res.turn} turns</strong>.<br/>
+      <em style="font-size:.8rem;color:var(--fog);">Campaign path: ${path.join(' → ') || 'classic conquest'}</em>`;
+    document.getElementById('win-modal').style.display='flex';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function updateRes(){
+  document.getElementById('r-army').textContent=res.army.toLocaleString();
+  document.getElementById('r-gold').textContent=res.gold.toLocaleString();
+  document.getElementById('r-morale').textContent=res.morale+'%';
+  document.getElementById('r-turn').textContent=res.turn;
+  const owned=T.filter(t=>t.owner==='player').length;
+  document.getElementById('hud-terr').textContent=`${owned}/15`;
+  document.getElementById('hud-prog').style.width=`${(owned/15)*100}%`;
+}
+
+function log(msg,type='info'){
+  const lb=document.getElementById('log-body');
+  const d=document.createElement('div');
+  d.className=`lentry ${type}`;
+  d.innerHTML=`<span class="ltime">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>${msg}`;
+  lb.prepend(d);
+  while(lb.children.length>55)lb.removeChild(lb.lastChild);
+}
+
+function addStep(txt,cls=''){
+  const sl=document.getElementById('step-list');
+  const d=document.createElement('div');d.className=`step ${cls}`;d.textContent=txt;
+  sl.prepend(d);while(sl.children.length>32)sl.removeChild(sl.lastChild);
+}
+function markVis(lbl){
+  const sl=document.getElementById('step-list');
+  if(sl.firstChild)sl.firstChild.className='step vis';
+}
+
+let _tt;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+function showTip(t,e){
+  const tip=document.getElementById('maptip');
+  document.getElementById('tip-name').textContent=t.name;
+  document.getElementById('tip-row1').textContent=`Garrison: ${t.units.toLocaleString()} · ${t.owner==='player'?'Imperial':t.owner==='enemy'?'Enemy':'Neutral'}`;
+  document.getElementById('tip-row2').textContent=`Status: ${t.status} · Cost: ${t.cost*50}g`;
+  tip.style.opacity='1';tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY+16)+'px';
+}
+function hideTip(){document.getElementById('maptip').style.opacity='0';}
+document.addEventListener('mousemove',e=>{const t=document.getElementById('maptip');if(t.style.opacity==='1'){t.style.left=(e.clientX+16)+'px';t.style.top=(e.clientY+16)+'px';}});
+
+// ── Keyboard ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='1')selectAlgo('BFS');
+  if(e.key==='2')selectAlgo('DFS');
+  if(e.key==='3')selectAlgo('Dijkstra');
+  if(e.key==='4')selectAlgo('Greedy');
+  if(e.key===' '){e.preventDefault();runAlgorithm();}
+  if(e.key==='Enter')conquerSelected();
+  if(e.key==='t'||e.key==='T')endTurn();
+});
+
+// ═══════════════════════════════════════════════════════════
+// STORY ENGINE
+// ═══════════════════════════════════════════════════════════
+const Story = (() => {
+  let fired = new Set();
+  let queue = [];
+  let isOpen = false;
+  let storyPath = []; // track player choices for branching
+
+  // ── Chapter labels ───────────────────────────────────────
+  const CHAPTERS = [
+    [0,  'I',   'THE EAGLE AWAKENS'],
+    [2,  'II',  'THE MARCH BEGINS'],
+    [5,  'III', 'THE CONTINENT TREMBLES'],
+    [8,  'IV',  'THE COALITION RISES'],
+    [11, 'V',   'THE FINAL GAMBIT'],
+    [14, 'VI',  'THE THRONE OF EUROPE'],
+  ];
+  function updateChapter(){
+    const owned = T.filter(t=>t.owner==='player').length;
+    let ch = CHAPTERS[0];
+    for(const c of CHAPTERS) if(owned >= c[0]) ch = c;
+    document.getElementById('chapter-hud').textContent =
+      `⚜  CHAPTER ${ch[1]} — ${ch[2]}`;
+  }
+
+  // ── Event definitions ────────────────────────────────────
+  const EVENTS = [
+
+    // ── 1. First Blood ──────────────────────────────────────
+    {
+      id: 'first_blood',
+      seal: '⚔', source: 'Battlefield Dispatch — Year XIII',
+      title: 'The Eagle Spreads Its Wings',
+      body: `The tricolor flies over new soil. Your marshals crowd the map table — <em>Murat</em> traces routes with a dagger, <em>Ney</em> demands an immediate advance. Beyond the conquered horizon, the crowns of Europe watch with growing unease.\n\nHow shall the Grande Armée press its advantage?`,
+      choices: [
+        { label: '⚡ Strike Like Lightning', sub: 'Rapid forced march — exhaust the men, shock the enemy',
+          effect: () => { res.army -= 3000; res.gold += 900; res.morale = Math.min(100, res.morale + 7); },
+          outcome: 'Forced marches shatter enemy formations before they can form. Your treasury swells with seized assets — but the men pay in blood and boot-leather. <em>(+900 Gold · +7 Morale · −3,000 Troops)</em>' },
+        { label: '🤝 Dispatch the Diplomats', sub: 'Win neutral lords with silver instead of steel',
+          effect: () => { res.gold -= 200; res.morale = Math.min(100, res.morale + 15); },
+          outcome: 'Envoys ride hard. Three neutral lords send cautious pledges of non-interference. The army\'s spirits rise — this emperor fights with his head as well as his sword. <em>(−200 Gold · +15 Morale)</em>' },
+        { label: '🏰 Fortify Our Gains', sub: 'Build supply depots before pushing further',
+          effect: () => { res.army += 5000; res.gold -= 300; },
+          outcome: 'Engineers throw up redoubts and magazines across the conquered territories. Fresh conscripts fill the ranks from the homeland. The advance slows — but the foundation is iron. <em>(+5,000 Army · −300 Gold)</em>' },
+      ],
+      trigger: (s) => !fired.has('first_blood') && T.filter(t=>t.owner==='player').length >= 2,
+    },
+
+    // ── 2. The Channel ──────────────────────────────────────
+    {
+      id: 'channel',
+      seal: '⚓', source: 'Naval Intelligence Report',
+      title: 'The Sea That Swallowed Empires',
+      body: `<em>London.</em> Your scouts stare across grey water at white cliffs that mock every ambition. Admiral Villeneuve's fleet lies scattered after Trafalgar. The Royal Navy owns the Channel.\n\nYet England's gold funds every coalition against you. Leave her unmolested and she will simply buy more enemies to replace each one you defeat.`,
+      choices: [
+        { label: '⛵ The Continental Blockade', sub: 'Strangle British trade — cut off her gold',
+          effect: () => { res.morale = Math.min(100, res.morale + 10); T.find(t=>t.name==='London').gold += 300; },
+          outcome: 'Imperial decrees seal every friendly port to British shipping. England\'s merchants howl. Her subsidies to the Coalition thin. The blockade is imperfect — but England bleeds. <em>(+10 Morale · London reward +300g)</em>' },
+        { label: '🔥 Burn the Bridges Eastward', sub: 'Ignore England — the East holds the real prize',
+          effect: () => { res.army += 4000; res.morale = Math.min(100, res.morale + 5); },
+          outcome: 'Let England rot on her island. The Tsar, the Kaiser, the Sultan — these are the crowns worth wearing. Fresh levies stream east from the homeland. <em>(+4,000 Army · +5 Morale)</em>' },
+        { label: '💰 Bribe the Neutrals Against Her', sub: 'Spend gold to isolate Britain diplomatically',
+          effect: () => { res.gold -= 400; res.morale = Math.min(100, res.morale + 20); },
+          outcome: 'Silver does what cannon cannot. Three neutral powers sign secret treaties of exclusion against British goods. England\'s ambassadors rage. Your prestige soars across Europe. <em>(−400 Gold · +20 Morale)</em>' },
+      ],
+      trigger: (s) => !fired.has('channel') && T.find(t=>t.name==='London')?.status !== 'unvisited',
+    },
+
+    // ── 3. The Prussian Lion ────────────────────────────────
+    {
+      id: 'prussia',
+      seal: '🦅', source: 'Intelligence Dossier — Berlin',
+      title: 'The Prussian Lion Stirs',
+      body: `<em>Berlin.</em> The ghost of Frederick the Great haunts its corridors. Prussia mobilises — 50,000 veterans in blue coats, artillery that levelled half of Europe a generation ago. King Frederick William hesitates, torn between fear and wounded pride.\n\nYour spy reports a window. The Prussian court is divided. One faction whispers peace; another straps on swords.`,
+      choices: [
+        { label: '📜 Offer a Secret Treaty', sub: 'Give Prussia a sphere of influence in the East',
+          effect: () => { const b = T.find(t=>t.name==='Berlin'); if(b){ b.owner='neutral'; b.status='scouted'; b.units=Math.floor(b.units*.5); } res.morale=Math.min(100,res.morale+12); },
+          outcome: 'A courier rides under a white flag. By dawn, a secret accord is signed. Berlin\'s garrison stands down. Prussia will not march — for now. <em>(Berlin neutralised · half garrison · +12 Morale)</em>' },
+        { label: '⚔ Crush Them Before They Unite', sub: 'Strike the Prussian army before it finishes mobilising',
+          effect: () => { res.army -= 5000; res.gold += 600; res.morale=Math.min(100,res.morale+8); storyPath.push('aggressive'); },
+          outcome: 'Speed is everything. The Grande Armée crosses the border in a night march. Three Prussian columns destroyed in detail before they can concentrate. Brutal — and effective. <em>(−5,000 Army · +600 Gold · +8 Morale)</em>' },
+        { label: '🕵 Use Their Own Spies Against Them', sub: 'Feed false intelligence to the Prussian court',
+          effect: () => { res.gold -= 250; T.find(t=>t.name==='Berlin').cost = Math.max(1, T.find(t=>t.name==='Berlin').cost - 3); res.morale=Math.min(100,res.morale+6); },
+          outcome: 'Forged dispatches from a fictional Austrian alliance convince Berlin\'s war hawks to stand down. The true cost of Berlin drops as confusion grips their command. <em>(−250 Gold · Berlin cost −3 · +6 Morale)</em>' },
+      ],
+      trigger: (s) => !fired.has('prussia') && T.find(t=>t.name==='Berlin')?.status !== 'unvisited',
+    },
+
+    // ── 4. The Coalition Forms ──────────────────────────────
+    {
+      id: 'coalition',
+      seal: '👑', source: 'Ambassador\'s Report — Vienna, 1806',
+      title: 'The Kings Unite Against You',
+      body: `A courier arrives breathless at midnight. The news is grim: <em>Austria, Russia, and Prussia</em> have signed a new coalition treaty in Vienna. Britain\'s gold binds them together. They call it righteous war against a tyrant — though you notice it is the tyrant who keeps winning.\n\nYour marshals meet in urgent council. The army is spread thin. Every border now glows with enemy campfires.`,
+      choices: [
+        { label: '⚡ Divide and Destroy', sub: 'Strike Austria first — shatter the coalition\'s heart',
+          effect: () => { res.army += 3000; res.morale = Math.min(100, res.morale + 10); T.filter(t=>t.owner==='enemy').forEach(t=>t.units=Math.floor(t.units*.8)); storyPath.push('decisive'); },
+          outcome: 'You strike before they are ready. Austria reels. The coalition frays without its anchor. <em>(+3,000 Army · +10 Morale · Enemy garrisons weakened by 20%)</em>' },
+        { label: '🛡 Defensive Consolidation', sub: 'Trade space for time — let them come to you',
+          effect: () => { res.army += 8000; res.gold -= 200; res.morale = Math.max(0, res.morale - 5); storyPath.push('defensive'); },
+          outcome: 'Supply lines shorten. Interior lines make your army effectively larger. The coalition must advance into your strength. <em>(+8,000 Army · −200 Gold · −5 Morale)</em>' },
+        { label: '✉ Secret Diplomacy', sub: 'Bribe Austria out of the coalition secretly',
+          effect: () => { res.gold -= 600; const v=T.find(t=>t.name==='Vienna'); if(v){ v.owner='neutral'; v.status='scouted'; v.units=Math.floor(v.units*.6); } storyPath.push('diplomatic'); },
+          outcome: 'Austria accepts your terms — in secret. The coalition loses its southern flank. The other powers scramble to replace the gap. <em>(−600 Gold · Vienna neutralised)</em>' },
+      ],
+      trigger: (s) => !fired.has('coalition') && res.turn >= 4,
+    },
+
+    // ── 5. Morale Crisis ─────────────────────────────────────
+    {
+      id: 'morale_crisis',
+      seal: '💀', source: 'Marshal Berthier\'s Private Journal',
+      title: 'The Grumbling of the Ranks',
+      body: `The men are tired. You can feel it — the slowed step, the hollow eyes, the songs that nobody sings anymore. Three officers have been found with seditious pamphlets. A sergeant openly questioned orders at roll call.\n\n<em>A Grande Armée that doubts itself is half-defeated before it meets the enemy.</em>`,
+      choices: [
+        { label: '🎺 The Emperor Rides Among Them', sub: 'Lead from the front — your presence is worth ten thousand men',
+          effect: () => { res.morale = Math.min(100, res.morale + 25); res.army -= 500; },
+          outcome: '"The Emperor!" The cry runs down every column. Men who were ready to desert weep with pride. You ride without a cloak in driving rain. They would die for you now. <em>(+25 Morale · −500 exposed staff/escorts)</em>' },
+        { label: '💰 Pay the Arrears', sub: 'Distribute promised bonuses — silver cures many doubts',
+          effect: () => { res.gold -= 500; res.morale = Math.min(100, res.morale + 18); },
+          outcome: 'Paymasters work through the night. By morning every soldier has coins in his hand and a hot meal in his belly. The grumbling stops. <em>(−500 Gold · +18 Morale)</em>' },
+        { label: '🩸 Make an Example', sub: 'Court-martial the ringleaders — fear is a type of loyalty',
+          effect: () => { res.morale = Math.min(100, res.morale + 10); res.army -= 1500; storyPath.push('iron_fist'); },
+          outcome: 'Three ringleaders are shot at dawn. The rest stand at attention and do not blink. The army obeys. Whether it still believes — that is another question. <em>(+10 Morale · −1,500 Army)</em>' },
+      ],
+      trigger: (s) => !fired.has('morale_crisis') && res.morale < 40 && T.filter(t=>t.owner==='player').length >= 3,
+    },
+
+    // ── 6. Empty Treasury ───────────────────────────────────
+    {
+      id: 'treasury',
+      seal: '💰', source: 'Director of the Imperial Treasury',
+      title: 'The Coffers Run Dry',
+      body: `Your Finance Minister stands ashen before the map table. The numbers do not lie: the treasury is nearly exhausted. Armies do not march on glory alone — they march on bread, powder, and coin.\n\n<em>Without gold, the most brilliant strategy becomes a list of things you cannot do.</em>`,
+      choices: [
+        { label: '📜 The Continental Levy', sub: 'Tax conquered territories at emergency rates',
+          effect: () => { const owned=T.filter(t=>t.owner==='player').length; res.gold+=owned*150; res.morale=Math.max(0,res.morale-12); },
+          outcome: 'Imperial tax collectors fan out with soldiers at their backs. The gold flows — but the conquered territories seethe. Resentment is a debt you will pay later. <em>(+150g per territory · −12 Morale)</em>' },
+        { label: '🏦 Issue War Bonds', sub: 'Borrow against future conquests — pay with tomorrow\'s gold',
+          effect: () => { res.gold += 800; },
+          outcome: 'Bankers in Paris issue bonds against the promise of imperial victory. It works — for now. The empire\'s credit holds. The debt grows silently in the background. <em>(+800 Gold)</em>' },
+        { label: '⚔ Seize Enemy Supplies', sub: 'Live off the land — raid enemy-held territories',
+          effect: () => { res.gold += 500; T.filter(t=>t.owner==='enemy').forEach(t=>t.units=Math.floor(t.units*.9)); res.morale=Math.min(100,res.morale+5); },
+          outcome: 'Your cavalry rides deep, torching supply dumps and seizing magazines. The enemy scrambles to protect their logistics. <em>(+500 Gold · Enemy units −10% · +5 Morale)</em>' },
+      ],
+      trigger: (s) => !fired.has('treasury') && res.gold < 350 && T.filter(t=>t.owner==='player').length >= 3,
+    },
+
+    // ── 7. The Road to Moscow ────────────────────────────────
+    {
+      id: 'moscow',
+      seal: '❄', source: 'Reconnaissance Report — Eastern Front',
+      title: 'The Endless Road East',
+      body: `<em>Moscow.</em> Six hundred thousand men. The largest army ever assembled on European soil points east into the infinite Russian steppe. Your generals grow quiet at the maps. Even Murat — who fears nothing — does not joke tonight.\n\nYour veteran sergeant, a man who fought at the Pyramids and Austerlitz, whispers: <em>"Sire, the Russian winter does not negotiate."</em>`,
+      choices: [
+        { label: '🔥 Forward — Glory or Ruin', sub: 'March on Moscow — nothing less than total victory',
+          effect: () => { res.army -= 8000; res.morale = Math.min(100, res.morale + 15); storyPath.push('moscow_march'); T.find(t=>t.name==='Moscow').cost = Math.max(5, T.find(t=>t.name==='Moscow').cost - 4); },
+          outcome: 'The army cheers. The eagle standards tilt east. History will judge whether this was genius or madness — but it will not call it timid. <em>(−8,000 vanguard casualties · +15 Morale · Moscow cost −4)</em>' },
+        { label: '🕊 Offer Peace at Warsaw', sub: 'Declare victory — establish the eastern border now',
+          effect: () => { res.gold += 1000; res.morale = Math.min(100, res.morale + 8); storyPath.push('warsaw_peace'); },
+          outcome: 'Envoys ride to Tsar Alexander with generous terms. The Tsar... listens. A treaty of mutual recognition is signed. The continent exhales. Perhaps this is wisdom — or perhaps the moment will come again. <em>(+1,000 Gold · +8 Morale)</em>' },
+        { label: '⚡ Destroy Their Army, Not Their Capital', sub: 'Force a decisive battle — avoid the Russian interior',
+          effect: () => { res.army -= 4000; T.find(t=>t.name==='Moscow').units = Math.floor(T.find(t=>t.name==='Moscow').units*.65); res.morale=Math.min(100,res.morale+10); },
+          outcome: 'You refuse the Russian strategy of withdrawal. Your cavalry screens cut off their retreat. A vast engagement destroys the Russian field army before it can melt away into the steppe. <em>(−4,000 Army · Moscow garrison −35% · +10 Morale)</em>' },
+      ],
+      trigger: (s) => !fired.has('moscow') && T.find(t=>t.name==='Moscow')?.status !== 'unvisited',
+    },
+
+    // ── 8. Overextension ─────────────────────────────────────
+    {
+      id: 'overextension',
+      seal: '⚠', source: 'Grand Staff Memorandum — Confidential',
+      title: 'The Limits of Empire',
+      body: `Your Chief of Staff presents a cold truth: the empire's supply lines now span three thousand kilometres. Every garrison weakens the army at the front. Conquered territories require occupation troops. Enemies sense the strain.\n\n<em>History is full of men who won every battle and then lost the war they were fighting.</em>`,
+      choices: [
+        { label: '📐 Rationalise the Lines', sub: 'Abandon distant garrisons — concentrate the army',
+          effect: () => { res.army += 10000; const distant=T.filter(t=>t.owner==='player'&&t.id>9); distant.forEach(t=>{t.owner='neutral';t.status='scouted';}); res.morale=Math.max(0,res.morale-8); },
+          outcome: 'Painful orders go out. Distant garrisons march back to join the main army. Some territories slip from your grasp — but the fist that remains is harder. <em>(+10,000 concentrated Army · distant territories abandoned · −8 Morale)</em>' },
+        { label: '💪 Push Through — Momentum is Everything', sub: 'Double down — conquer faster than resistance can form',
+          effect: () => { res.morale = Math.min(100, res.morale + 12); res.army += 2000; storyPath.push('total_war'); },
+          outcome: '"Forward!" you cry. The army feeds on momentum, on the belief that one more battle will end all battles. Perhaps it is true. Perhaps it is the last beautiful lie of empire. <em>(+12 Morale · +2,000 reinforcements)</em>' },
+        { label: '🕊 Negotiate a Settlement', sub: 'Accept the Confederation of Europe — rule without governing all',
+          effect: () => { res.gold += 1200; res.morale = Math.min(100, res.morale + 5); storyPath.push('pax_napoleon'); },
+          outcome: 'The treaty is drafted in golden ink. You shall be First Among Equals — not the conqueror of Europe, but its arbiter. History will call it the Pax Napoleon. Whether it holds is another question. <em>(+1,200 Gold · +5 Morale · Diplomatic path opened)</em>' },
+      ],
+      trigger: (s) => !fired.has('overextension') && res.turn >= 8 && T.filter(t=>t.owner==='player').length < 10,
+    },
+
+    // ── 9. Vienna Falls ──────────────────────────────────────
+    {
+      id: 'vienna_falls',
+      seal: '🏰', source: 'Victory Proclamation — Schönbrunn Palace',
+      title: 'The Habsburg Eagle Bows',
+      body: `<em>Vienna.</em> The city that has never fallen — until now. Emperor Francis II signs in a room that smells of old power and new defeat. Your boots are on the most ancient throne room floor in Europe.\n\nMarshals toast with Habsburg wine. Through the tall windows, the city is silent, watching, waiting to see what kind of master has arrived.`,
+      choices: [
+        { label: '👑 Magnanimous Victor', sub: 'Treat Vienna with honour — make her a jewel of the empire',
+          effect: () => { res.morale = Math.min(100, res.morale + 20); T.filter(t=>t.owner==='enemy'||t.owner==='neutral').forEach(t=>t.cost=Math.max(1,t.cost-1)); storyPath.push('magnanimous'); },
+          outcome: 'You ride through Vienna without looting, restore order in an afternoon, and dine with Habsburg nobles. Word spreads across the continent: this emperor rewards submission. Resistance softens everywhere. <em>(+20 Morale · All remaining territory costs −1)</em>' },
+        { label: '⚜ Extract Maximum Tribute', sub: 'Strip the treasury — fund the next campaign',
+          effect: () => { res.gold += 1500; res.army += 3000; res.morale = Math.max(0, res.morale - 10); },
+          outcome: 'The Habsburg treasury is emptied. Artworks, bullion, and archives are loaded onto wagons. The funds will equip three new corps. Vienna\'s people do not forgive — but you will be long gone before that matters. <em>(+1,500 Gold · +3,000 Army · −10 Morale)</em>' },
+        { label: '💍 A Habsburg Marriage', sub: 'Bind the dynasties — make the old enemy family',
+          effect: () => { res.morale = Math.min(100, res.morale + 15); res.gold += 700; T.filter(t=>t.owner==='enemy').forEach(t=>{t.units=Math.floor(t.units*.85);}); storyPath.push('dynastic'); },
+          outcome: 'An imperial marriage is proposed. The Habsburgs, calculating as ever, accept. The news rocks every chancellery in Europe. You are no longer an upstart — you are dynasty. <em>(+15 Morale · +700 Gold · Enemy morale weakened −15%)</em>' },
+      ],
+      trigger: (s) => !fired.has('vienna_falls') && T.find(t=>t.name==='Vienna')?.owner==='player',
+    },
+  ];
+
+  // ── Engine ────────────────────────────────────────────────
+  function check(){
+    updateChapter();
+    for(const ev of EVENTS){
+      if(!fired.has(ev.id) && ev.trigger()){
+        queue.push(ev);
+        fired.add(ev.id);
+      }
+    }
+    if(!isOpen && queue.length) show(queue.shift());
+  }
+
+  function show(ev){
+    isOpen = true;
+    document.getElementById('story-ornament').textContent = ev.seal || '⚜';
+    document.getElementById('story-source').textContent = ev.source;
+    document.getElementById('story-title').textContent = ev.title;
+    document.getElementById('story-body').innerHTML = ev.body.replace(/\n/g,'<br><br>');
+    const cEl = document.getElementById('story-choices');
+    cEl.innerHTML = '';
+    const conseqEl = document.getElementById('story-consequence');
+    const contBtn   = document.getElementById('story-continue');
+    conseqEl.style.display = 'none';
+    contBtn.style.display  = 'none';
+
+    ev.choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'story-choice';
+      btn.innerHTML = `<div class="sc-label">${ch.label}</div><div class="sc-sub">${ch.sub}</div>`;
+      btn.onclick = () => {
+        // apply effect
+        ch.effect();
+        updateRes();
+        renderMap();
+        // show outcome
+        cEl.style.display = 'none';
+        conseqEl.innerHTML = ch.outcome;
+        conseqEl.style.display = 'block';
+        contBtn.style.display = 'block';
+        log(`[Story Choice] ${ch.label}`, 'algo');
+      };
+      cEl.appendChild(btn);
+    });
+
+    document.getElementById('story-modal').style.display = 'flex';
+  }
+
+  function close(){
+    document.getElementById('story-modal').style.display = 'none';
+    document.getElementById('story-choices').style.display = 'flex'; // reset for next event
+    isOpen = false;
+    if(queue.length) setTimeout(()=>show(queue.shift()), 400);
+  }
+
+  function reset(){
+    fired = new Set();
+    queue = [];
+    isOpen = false;
+    storyPath = [];
+    document.getElementById('story-modal').style.display = 'none';
+    document.getElementById('chapter-hud').textContent = '⚜  CHAPTER I — THE EAGLE AWAKENS';
+  }
+
+  function getPath(){ return storyPath; }
+
+  return { check, close, reset, getPath, updateChapter };
+})();
+
+</script>
+</body>
+</html>
