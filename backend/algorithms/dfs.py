@@ -1,30 +1,31 @@
-def dfs(graph, start, visited=None, result=None):
-    """
-    Depth-First Search traversal from a starting node.
-    Explores as far as possible along each branch before backtracking.
-    Time complexity: O(V + E)
+# ─────────────────────────────────────────────────────────────────────────────
+# dfs.py  ·  Crown & Conquest – DAA-IV-T241
+# Depth-First Search — deep path traversal
+# Time Complexity:  O(V + E)
+# Space Complexity: O(V)  (recursion stack depth)
+# ─────────────────────────────────────────────────────────────────────────────
 
-    Args:
-        graph: MapGraph object with .get_neighbors()
-        start: Starting country name (string)
-        visited: Set of already-visited nodes (used in recursion)
-        result: Ordered list of visited countries (used in recursion)
 
-    Returns:
-        List of countries visited in DFS order
+def dfs(graph, start: str, visited: set = None, order: list = None,
+        parents: dict = None) -> dict:
     """
-    # Bug fix: result was missing — only visited (a set) was returned,
-    # which loses the traversal ORDER needed to show algorithm steps.
+    Recursive DFS from `start`.
+
+    Returns a dict with:
+      - 'order'   : territories in DFS visit order
+      - 'parents' : DFS-tree parent for each node
+    """
     if visited is None:
         visited = set()
-    if result is None:
-        result = []
+        order   = []
+        parents = {start: None}
 
     visited.add(start)
-    result.append(start)   # <-- was missing: set() has no order
+    order.append(start)
 
-    for neighbor, _weight in graph.get_neighbors(start):
-        if neighbor not in visited:
-            dfs(graph, neighbor, visited, result)
+    for neighbour, _weight in graph.get_neighbors(start):
+        if neighbour not in visited:
+            parents[neighbour] = start
+            dfs(graph, neighbour, visited, order, parents)
 
-    return result
+    return {"order": order, "parents": parents}

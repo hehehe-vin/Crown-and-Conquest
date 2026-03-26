@@ -64,7 +64,7 @@ body::after{
   display:flex;flex-direction:column;overflow:hidden;
   box-shadow:4px 0 28px rgba(0,0,0,.55);
 }
-.sb-sec{padding:12px 14px 8px;border-bottom:1px solid rgba(233,193,118,.07);}
+.sb-sec{padding:12px 14px 8px;border-bottom:1px solid rgba(233,193,118,.07);flex-shrink:0;}
 .sec-lbl{
   font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.28em;
   color:var(--parch2);text-transform:uppercase;margin-bottom:8px;opacity:.65;
@@ -97,7 +97,17 @@ body::after{
 .cx-desc{font-size:.68rem;color:var(--fog);margin-top:4px;font-style:italic;line-height:1.4;}
 
 /* info panel */
-#info-panel{padding:10px 14px;flex:1;overflow-y:auto;}
+#info-panel{padding:10px 14px;flex:1;overflow-y:auto;min-height:80px;}
+
+/* marshal panel */
+#marshal-panel{padding:9px 14px 6px;border-top:1px solid rgba(233,193,118,.07);max-height:185px;overflow-y:auto;flex-shrink:0;}
+.m-row{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.m-row:last-child{border-bottom:none;}
+.m-avatar{width:22px;height:22px;border-radius:50%;background:rgba(233,193,118,.1);border:1px solid rgba(233,193,118,.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;}
+.m-name{font-family:'Cinzel',serif;font-size:.62rem;color:var(--parch);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.m-loy-bar{width:42px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;flex-shrink:0;}
+.m-loy-fill{height:100%;border-radius:2px;transition:width .4s;}
+.m-dead{opacity:.3;text-decoration:line-through;}
 #info-panel::-webkit-scrollbar{width:3px;}
 #info-panel::-webkit-scrollbar-thumb{background:rgba(233,193,118,.18);border-radius:2px;}
 .tcard{background:rgba(233,193,118,.04);border:1px solid rgba(233,193,118,.13);border-radius:2px;padding:10px;margin-bottom:6px;}
@@ -106,7 +116,7 @@ body::after{
 .tkey{color:var(--fog);}.tval{color:var(--parch);font-weight:600;}
 
 /* speed */
-.speed-ctrl{display:flex;align-items:center;gap:7px;padding:7px 14px;border-top:1px solid rgba(233,193,118,.07);}
+.speed-ctrl{display:flex;align-items:center;gap:7px;padding:7px 14px;border-top:1px solid rgba(233,193,118,.07);flex-shrink:0;}
 .speed-ctrl label{font-size:.58rem;color:var(--fog);font-family:'Cinzel',serif;letter-spacing:.1em;white-space:nowrap;}
 input[type=range]{flex:1;accent-color:var(--gold);height:3px;background:rgba(233,193,118,.18);border-radius:2px;outline:none;-webkit-appearance:none;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:var(--gold);border-radius:50%;cursor:pointer;}
@@ -119,7 +129,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
   border:1px solid rgba(233,193,118,.28);border-radius:2px;
   font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.14em;
   color:var(--gold2);cursor:pointer;transition:all .18s;text-transform:uppercase;
-  box-shadow:0 3px 16px rgba(123,31,31,.38);
+  box-shadow:0 3px 16px rgba(123,31,31,.38);flex-shrink:0;
 }
 .act-btn:hover{background:linear-gradient(135deg,var(--imperial2) 0%,var(--imperial) 100%);transform:translateY(-1px);}
 .act-btn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
@@ -350,6 +360,50 @@ g[data-state="greedy"]    circle.ncirc{fill:#5a1a5a;stroke:#c080c0;stroke-width:
   font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.2em;
   color:rgba(233,193,118,.4);pointer-events:none;z-index:25;
 }
+
+/* ═══════════════════════════════════════════
+   MARSHAL PANEL
+═══════════════════════════════════════════ */
+#marshal-panel{
+  padding:10px 14px 8px;
+  border-top:1px solid rgba(233,193,118,.07);
+  border-bottom:1px solid rgba(233,193,118,.07);
+  max-height:185px;overflow-y:auto;flex-shrink:0;
+}
+.marshal-row{
+  display:flex;align-items:center;gap:7px;
+  padding:4px 0;border-bottom:1px solid rgba(233,193,118,.05);
+}
+.marshal-row:last-child{border-bottom:none;}
+.m-avatar{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+  border:1px solid rgba(233,193,118,.2);
+  background:rgba(0,0,0,.3);
+}
+.m-avatar.dead{opacity:.3;filter:grayscale(1);}
+.m-info{flex:1;min-width:0;}
+.m-name{
+  font-family:'Cinzel',serif;font-size:.62rem;color:var(--gold2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.m-title{font-size:.56rem;color:var(--fog);font-style:italic;line-height:1.2;}
+.m-bars{display:flex;flex-direction:column;gap:2px;width:52px;flex-shrink:0;}
+.m-bar-wrap{position:relative;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
+.m-bar-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.m-bar-fill.loyalty{background:linear-gradient(90deg,#7b1f1f,#e9c176);}
+.m-bar-fill.glory{background:linear-gradient(90deg,#1a3a5c,#8ab4e0);}
+.m-legend{display:flex;justify-content:space-between;font-size:.5rem;color:var(--fog);margin-top:1px;}
+.m-status{
+  font-size:.58rem;padding:1px 5px;border-radius:2px;flex-shrink:0;
+  font-family:'Cinzel',serif;
+}
+.m-status.loyal{background:rgba(58,96,40,.35);color:#7ab870;border:1px solid rgba(122,184,112,.2);}
+.m-status.wavering{background:rgba(150,100,20,.35);color:#e9c176;border:1px solid rgba(233,193,118,.2);}
+.m-status.hostile{background:rgba(123,31,31,.35);color:#c06060;border:1px solid rgba(192,96,96,.2);}
+.m-status.legend{background:rgba(26,58,110,.45);color:#8ab4e0;border:1px solid rgba(138,180,224,.2);}
+.m-status.dead{background:rgba(40,40,40,.5);color:#666;border:1px solid rgba(100,100,100,.2);}
 </style>
 </head>
 <body>
@@ -487,6 +541,14 @@ g[data-state="greedy"]    circle.ncirc{fill:#5a1a5a;stroke:#c080c0;stroke-width:
       <div id="tinfo"><div style="color:var(--fog);font-size:.72rem;font-style:italic;">Click a territory on the map to inspect it.</div></div>
     </div>
 
+    <!-- Marshal Panel -->
+    <div id="marshal-panel">
+      <div class="sec-lbl">Imperial Staff</div>
+      <div id="marshal-list">
+        <div style="color:var(--fog);font-size:.65rem;font-style:italic;">Campaign not yet begun.</div>
+      </div>
+    </div>
+
     <!-- Speed -->
     <div class="speed-ctrl">
       <label>SPEED</label>
@@ -591,6 +653,7 @@ let algo='Dijkstra', selId=null, running=false, abortFlag=false, animMs=750;
 // ═══════════════════════════════════════════════════════════
 function startGame(){
   document.getElementById('intro-modal').style.display='none';
+  Story.updateMarshals();
   renderMap();
   log('Campaign initiated. The Emperor awaits victory.','info');
   log('Paris is under Imperial control.','victory');
@@ -967,11 +1030,15 @@ function checkWin(){
       flavour = 'The Pax Napoleon holds. You are not merely an emperor — you are the architect of a new European order. The old kings play the game by your rules now.';
     else if(path.includes('aggressive') && path.includes('decisive'))
       flavour = 'You fought like a blade with no handle — cutting everything, including those who held it. Europe is conquered. What happens when there is nothing left to conquer?';
+    const ms = Story.getMarshalSummary();
+    const marshalLines = [
+      ms.legends.length ? '<span style="color:#8ab4e0">\u2605 Legends: ' + ms.legends.join(', ') + '</span>' : '',
+      ms.loyal.length   ? '<span style="color:#7ab870">\u2713 Loyal: '   + ms.loyal.join(', ')   + '</span>' : '',
+      ms.hostile.length ? '<span style="color:#c06060">\u26a0 Hostile: ' + ms.hostile.join(', ') + '</span>' : '',
+      ms.fallen.length  ? '<span style="color:#666">\u2020 Fallen: '     + ms.fallen.join(', ')  + '</span>' : '',
+    ].filter(Boolean).join(' &nbsp;&middot;&nbsp; ');
     document.getElementById('win-stats').innerHTML=
-      `${flavour}<br/><br/>
-      Army: ${res.army.toLocaleString()} · Gold: ${res.gold.toLocaleString()} · Morale: ${res.morale}%<br/>
-      Completed in <strong>${res.turn} turns</strong>.<br/>
-      <em style="font-size:.8rem;color:var(--fog);">Campaign path: ${path.join(' → ') || 'classic conquest'}</em>`;
+      flavour+'<br/><br/>Army: '+res.army.toLocaleString()+' &middot; Gold: '+res.gold.toLocaleString()+' &middot; Morale: '+res.morale+'%<br/>Completed in <strong>'+res.turn+' turns</strong>.<br/><div style="margin-top:8px;font-size:.78rem;line-height:1.8;">'+marshalLines+'</div><em style="font-size:.75rem;color:var(--fog);display:block;margin-top:6px;">Campaign path: '+(path.join(' \u2192 ')||'classic conquest')+'</em>';
     document.getElementById('win-modal').style.display='flex';
   }
 }
@@ -979,7 +1046,28 @@ function checkWin(){
 // ═══════════════════════════════════════════════════════════
 // UI HELPERS
 // ═══════════════════════════════════════════════════════════
+function updateMarshals(){
+  if(typeof MARSHALS === 'undefined') return;
+  const el = document.getElementById('marshal-list');
+  if(!el) return;
+  el.innerHTML = '';
+  const avatars = {murat:'🐎',ney:'🗡',berthier:'📋',talleyrand:'🕯',josephine:'💌'};
+  Object.entries(MARSHALS).forEach(([id,m])=>{
+    const row = document.createElement('div');
+    row.className = 'm-row' + (m.alive?'':' m-dead');
+    const loyPct = m.loyalty;
+    const loyColor = loyPct>=70?'#7ab870':loyPct>=40?'#e9c176':'#e07070';
+    row.innerHTML = `
+      <div class="m-avatar">${avatars[id]||'⚔'}</div>
+      <div class="m-name" title="${m.title}">${m.name}</div>
+      <div class="m-loy-bar"><div class="m-loy-fill" style="width:${loyPct}%;background:${loyColor}"></div></div>
+    `;
+    el.appendChild(row);
+  });
+}
+
 function updateRes(){
+  updateMarshals();
   document.getElementById('r-army').textContent=res.army.toLocaleString();
   document.getElementById('r-gold').textContent=res.gold.toLocaleString();
   document.getElementById('r-morale').textContent=res.morale+'%';
@@ -1044,6 +1132,19 @@ const Story = (() => {
   let queue = [];
   let isOpen = false;
   let storyPath = []; // track player choices for branching
+
+  // ── Character state — marshals & relationships ────────────
+  const MARSHALS = {
+    murat:     { name:'Murat',     title:'King of Naples',     loyalty:80, alive:true, glory:0 },
+    ney:       { name:'Ney',       title:'Prince of the Moskva', loyalty:90, alive:true, glory:0 },
+    berthier:  { name:'Berthier',  title:'Chief of Staff',     loyalty:75, alive:true, glory:0 },
+    talleyrand:{ name:'Talleyrand',title:'Foreign Minister',   loyalty:55, alive:true, glory:0 },
+    josephine: { name:'Josephine', title:'Empress',            loyalty:70, alive:true, glory:0 },
+  };
+  // Modify loyalty: delta can be positive or negative
+  function mloy(id, delta){ const m=MARSHALS[id]; if(m&&m.alive) m.loyalty=Math.max(0,Math.min(100,m.loyalty+delta)); }
+  function mkill(id){ if(MARSHALS[id]) MARSHALS[id].alive=false; }
+  function mglory(id, pts){ if(MARSHALS[id]&&MARSHALS[id].alive) MARSHALS[id].glory+=pts; }
 
   // ── Chapter labels ───────────────────────────────────────
   const CHAPTERS = [
@@ -1244,7 +1345,239 @@ const Story = (() => {
       ],
       trigger: (s) => !fired.has('vienna_falls') && T.find(t=>t.name==='Vienna')?.owner==='player',
     },
-  ];
+
+    // ════════════════════════════════════════════════════════
+    // CHARACTER & WORLD-BUILDING EVENTS (C1–C11)
+    // ════════════════════════════════════════════════════════
+
+    // ── C1. Murat's Ambition ─────────────────────────────────
+    {
+      id: 'murat_ambition',
+      seal: '🐎', source: 'Private Letter — Marshal Murat',
+      title: 'The Cavalry King Wants a Crown',
+      body: `Joachim Murat rides into your tent unannounced, still in his opera-house uniform — gold braid, feathers, boots that cost more than a sergeant earns in a year. He is your brother-in-law. He is your finest cavalry commander. He also wants a kingdom of his own.\n\n<em>"Sire, I have won you six battles. I ask only for Naples. Let me be a king — I will be your most loyal one."</em>\n\nHe is not wrong about the six battles.`,
+      choices: [
+        { label: '👑 Grant Him Naples', sub: 'A king on your flank — loyal or ambitious?',
+          effect: () => { mloy('murat', +20); mglory('murat', 30); res.morale = Math.min(100, res.morale+8); storyPath.push('murat_king'); T.find(t=>t.name==='Naples').cost = Math.max(1, T.find(t=>t.name==='Naples').cost-3); },
+          outcome: 'Murat weeps. It is the only time you have ever seen him cry. He swears on his sword, his children, his soul. Naples will be yours before spring. <em>(Murat loyalty +20 · Naples cost −3 · +8 Morale)</em>' },
+        { label: '⚔ Promise Him — After the War', sub: 'Keep the carrot dangling; keep him hungry',
+          effect: () => { mloy('murat', -10); mglory('murat', 10); res.army += 2000; storyPath.push('murat_delayed'); },
+          outcome: 'Murat nods. He has heard this before. He rides out without another word and destroys an Austrian cavalry division the following morning — as if to remind you of the price of his waiting. <em>(+2,000 cavalry surge · Murat loyalty −10)</em>' },
+        { label: '🗡 Refuse — Crowns Are Not Rewards', sub: 'Loyalty must be unconditional — set the precedent',
+          effect: () => { mloy('murat', -25); res.morale = Math.max(0, res.morale-5); storyPath.push('murat_refused'); },
+          outcome: 'The temperature in the tent drops. Murat clicks his heels, turns, and leaves without saluting. The next battle he fights brilliantly — but does not report to you afterward for two days. <em>(Murat loyalty −25 · −5 Morale)</em>' },
+      ],
+      trigger: () => !fired.has('murat_ambition') && T.filter(t=>t.owner==='player').length >= 4,
+    },
+
+    // ── C2. Talleyrand's Warning ─────────────────────────────
+    {
+      id: 'talleyrand_warning',
+      seal: '🕯', source: 'Encrypted Dispatch — Foreign Ministry',
+      title: 'The Limping Devil Speaks',
+      body: `Talleyrand does not come to you. He never does. He sends a sealed note — three sentences, no signature — delivered via a baker's boy at three in the morning.\n\n<em>"Sire. You are winning too fast. Europe will not forgive you for making her feel small. Consider what you want to be remembered as — conqueror or architect."</em>\n\nYou know he is already speaking to foreign courts. You also know he is usually right.`,
+      choices: [
+        { label: '📜 Heed the Warning — Slow Down', sub: 'Consolidate, negotiate, build legitimacy',
+          effect: () => { mloy('talleyrand', +20); res.gold += 600; T.filter(t=>t.owner==='enemy').forEach(t=>t.cost=Math.max(1,t.cost-1)); storyPath.push('talleyrand_heeded'); },
+          outcome: 'You send Talleyrand to Vienna with generous terms. Three minor powers accept neutrality. The conquest becomes a negotiation. Slower — but the ground beneath the empire grows firmer. <em>(+600 Gold · All enemy costs −1 · Talleyrand loyalty +20)</em>' },
+        { label: '🔥 Dismiss Him — Victory Needs No Apology', sub: 'Winners write the history; let them call it conquest',
+          effect: () => { mloy('talleyrand', -30); res.army += 4000; storyPath.push('talleyrand_dismissed'); },
+          outcome: 'You crumple the note and toss it into the fire. Talleyrand, you are told, smiled when he learned this. He is already composing letters to Saint Petersburg. <em>(+4,000 Army · Talleyrand loyalty −30)</em>' },
+        { label: '🤝 Invite Him to Court — Co-opt the Spy', sub: 'Keep your enemies closer than your friends',
+          effect: () => { mloy('talleyrand', +5); res.gold += 300; res.morale = Math.min(100,res.morale+10); storyPath.push('talleyrand_coopt'); },
+          outcome: 'Talleyrand accepts your summons with a bow that somehow implies he was always planning to come. Within a week he has made himself indispensable. You are not sure if this is better or worse. <em>(+300 Gold · +10 Morale · Talleyrand proximity)</em>' },
+      ],
+      trigger: () => !fired.has('talleyrand_warning') && res.turn >= 3 && T.filter(t=>t.owner==='player').length >= 3,
+    },
+
+    // ── C3. Ney's Last Stand ─────────────────────────────────
+    {
+      id: 'ney_glory',
+      seal: '🗡', source: 'Eyewitness Account — Officer of the Guard',
+      title: 'The Bravest of the Brave',
+      body: `The dispatch arrives in pieces, written by three different hands as the first two scribes fell. Michel Ney held a river crossing for six hours against twenty thousand men with four thousand.\n\nHe lost half his corps. He saved your eastern flank.\n\n<em>He is sitting on a cartridge box when they find him, reloading a private's musket. His sword has been broken. His uniform is completely black with powder. He does not look up when you arrive.</em>`,
+      choices: [
+        { label: '🎖 Promote Him — Marshal of the Empire', sub: 'Make him a legend while he can still enjoy it',
+          effect: () => { mloy('ney', +25); mglory('ney', 50); res.morale = Math.min(100, res.morale+15); res.army += 3000; storyPath.push('ney_legend'); },
+          outcome: 'You pin the medal yourself. The army watches. Men who have not cried since childhood are crying now. Whatever comes next, these men will follow Ney — and Ney will follow you. <em>(+15 Morale · +3,000 reinforcement surge · Ney loyalty +25)</em>' },
+        { label: '💰 Reward Him in Gold', sub: 'Practical recognition — his family is provided for',
+          effect: () => { mloy('ney', +10); res.gold -= 400; mglory('ney', 20); res.army += 1500; },
+          outcome: 'Ney takes the purse without counting it. "The men are the ones who need it, Sire." He divides it among the widows of his corps by morning. You hear about this second-hand, and it tells you everything about him. <em>(+1,500 troops · −400 Gold · Ney loyalty +10)</em>' },
+        { label: '📋 Acknowledge It in the Bulletin', sub: 'Public honour costs nothing — name him in dispatches',
+          effect: () => { mloy('ney', +5); mglory('ney', 15); res.morale = Math.min(100, res.morale+7); },
+          outcome: 'The Imperial Bulletin calls him "the bravest of the brave." The phrase spreads to every tavern in France. Ney says nothing when you tell him — but he straightens, and does not slouch again for the rest of the campaign. <em>(+7 Morale · a phrase history will remember)</em>' },
+      ],
+      trigger: () => !fired.has('ney_glory') && T.filter(t=>t.owner==='player').length >= 6 && MARSHALS.ney.alive,
+    },
+
+    // ── C4. Josephine's Letter ───────────────────────────────
+    {
+      id: 'josephine',
+      seal: '💌', source: 'Personal Correspondence — Malmaison',
+      title: 'A Letter from the Empress',
+      body: `The letter arrives in a box of roses — her handwriting, the perfume she always uses. You read it three times before you allow yourself to understand what it says.\n\n<em>"The court is quiet without you. Too quiet. They speak of you only as an emperor now, never a man. I fear you are disappearing into the title. Come home when you can — not as Napoleon the Great, but as the Corsican who used to argue about poetry at two in the morning."</em>\n\nYou have not argued about poetry in three years.`,
+      choices: [
+        { label: '✍ Write Back — Tonight', sub: 'Remember who you were before the crown',
+          effect: () => { mloy('josephine', +20); res.morale = Math.min(100, res.morale+12); storyPath.push('josephine_bond'); },
+          outcome: 'You write four pages. You cross out half of it. You send it anyway. Something in the camp feels lighter the next morning — the soldiers notice, without knowing why, that the Emperor smiles at breakfast. <em>(+12 Morale · the empire has a human heart)</em>' },
+        { label: '📦 Send Her Gifts Instead', sub: 'Diamonds speak when words are too hard',
+          effect: () => { mloy('josephine', +5); res.gold -= 300; res.morale = Math.min(100, res.morale+5); },
+          outcome: 'A courier rides west with a chest of Habsburg jewels. Josephine will wear them beautifully and understand exactly what they mean. Which is: that you read the letter, and could not answer it. <em>(−300 Gold · +5 Morale)</em>' },
+        { label: '🗺 There Is No Time for Letters', sub: 'The campaign cannot wait for sentiment',
+          effect: () => { mloy('josephine', -20); storyPath.push('josephine_distant'); res.army += 1000; },
+          outcome: 'You place the letter in the fire, carefully, the way you do everything. The ashes curl. You return to the maps. The adjutant who watches says nothing, but later writes in his diary: <em>"Tonight the Emperor became fully emperor."</em> <em>(+1,000 Army · the cost is invisible, and therefore the worst kind)</em>' },
+      ],
+      trigger: () => !fired.has('josephine') && res.turn >= 5 && storyPath.length >= 2,
+    },
+
+    // ── C5. The Spy in the Court ─────────────────────────────
+    {
+      id: 'spy_court',
+      seal: '🕵', source: 'Secret Police — Fouché\'s Bureau',
+      title: 'A Traitor Drinks Your Wine',
+      body: `Fouché's agents have identified a leak. Imperial battle plans have been reaching enemy commanders within forty-eight hours of your councils. Someone at your table is selling you.\n\nFouché has three suspects. He will not name them without your authorisation — he does not want to be responsible for executing a marshal on suspicion.`,
+      choices: [
+        { label: '🔍 Investigate Quietly — Let the Spy Reveal Himself', sub: 'Feed false plans; watch who acts on them',
+          effect: () => { res.gold -= 200; T.filter(t=>t.owner==='enemy').forEach(t=>{t.units=Math.floor(t.units*.85);}); storyPath.push('spy_patience'); mloy('talleyrand',+10); },
+          outcome: 'False orders go to three suspects. Within a week, one enemy army moves to exactly the wrong place. You know the name now. You say nothing. The spy continues to send reports — all of them yours to write. Enemy forces caught off-guard. <em>(Enemy garrisons −15% · −200 Gold · Fouché indebted to you)</em>' },
+        { label: '⚖ Arrest All Three — Pour Encourager Les Autres', sub: 'Guilt is secondary; the leak must stop today',
+          effect: () => { res.morale = Math.max(0,res.morale-15); res.army -= 1000; storyPath.push('spy_purge'); mloy('berthier',-20); mloy('murat',-15); },
+          outcome: 'Three men are taken at dawn. One is innocent — you know this before the week is out. The court grows cold and watchful. Officers stop speaking freely in councils. The leak stops. So does something else. <em>(−15 Morale · −1,000 from purge · marshal trust damaged)</em>' },
+        { label: '🤐 Bury It — Trust No One, Tell No One', sub: 'Change your councils; assume all plans are compromised',
+          effect: () => { res.army += 2000; storyPath.push('spy_buried'); },
+          outcome: 'You begin issuing false orders to your own staff — only you know the real plan. The system works. Battles are won that should have been lost. The cost is that you are now, functionally, alone. <em>(+2,000 from contingency reserves · the loneliest strategy in Europe)</em>' },
+      ],
+      trigger: () => !fired.has('spy_court') && res.turn >= 6 && T.filter(t=>t.owner==='player').length >= 5,
+    },
+
+    // ── C6. Berthier's Doubt ─────────────────────────────────
+    {
+      id: 'berthier_doubt',
+      seal: '📜', source: 'Chief of Staff — Marshal Berthier',
+      title: 'The Man Who Carries Everything',
+      body: `Louis-Alexandre Berthier has not slept in four days. You know this because you have also not slept in four days, and he is always there when you look up.\n\nHe sets down the final supply manifest and says, quietly, so only you can hear:\n\n<em>"Sire. We are 600 miles from Paris. The lines are stretched. We have lost 40,000 in the last two months. The men call this the Grande Armée still — but between us, is it?"</em>\n\nHis eyes are not afraid. They are honest, which is worse.`,
+      choices: [
+        { label: '🗺 Show Him the Full Plan — Take Him Into Your Confidence', sub: 'He has earned the truth; it might steady him',
+          effect: () => { mloy('berthier',+25); mglory('berthier',20); res.morale = Math.min(100,res.morale+10); storyPath.push('berthier_trusted'); },
+          outcome: 'You spread the full map. Everything — the contingencies, the exit strategies, the parts that require luck. Berthier studies it for an hour in silence. Then: "I understand now. I will make it work." He does not sleep for another two days. Neither do you. But something between you is different. <em>(+10 Morale · Berthier loyalty +25 · the best chief of staff in Europe is now truly yours)</em>' },
+        { label: '💪 Remind Him What the Grande Armée Has Already Done', sub: 'History is the answer to doubt',
+          effect: () => { res.morale = Math.min(100,res.morale+8); res.army += 2500; },
+          outcome: 'You list, quietly, every battle, every impossible thing these men have done. Marengo. Austerlitz. Jena. Wagram. Berthier writes them down as you speak — force of habit — and when you finish he looks at the list and almost smiles. <em>(+8 Morale · +2,500 remembered reserves)</em>' },
+        { label: '🔇 Tell Him To Focus on the Numbers, Not the Questions', sub: 'His job is logistics; let him do it',
+          effect: () => { mloy('berthier',-15); res.army += 1000; storyPath.push('berthier_distanced'); },
+          outcome: 'Berthier nods once. He picks up the manifest. He never raises it again. He also never looks at you the same way. You get perfect logistics and a man who has stopped offering you his judgment. <em>(+1,000 reserves managed · Berthier loyalty −15 · one less person who tells you the truth)</em>' },
+      ],
+      trigger: () => !fired.has('berthier_doubt') && res.turn >= 7 && T.filter(t=>t.owner==='player').length >= 7 && MARSHALS.berthier.alive,
+    },
+
+    // ── C7. The Pope's Gambit ────────────────────────────────
+    {
+      id: 'pope_gambit',
+      seal: '✝', source: 'Vatican Diplomatic Communiqué',
+      title: 'His Holiness Writes',
+      body: `The letter bears the Papal seal — real gold, not wax. Pius VII writes carefully, in a hand that has blessed kings and buried empires.\n\n<em>"We observe your armies move through the Christian kingdoms of Europe with a speed that permits no prayer before the cannon fires. We do not oppose the French nation. We ask only that Rome be considered what it has always been — the seat of the eternal, not a territory to be weighed in gold."</em>\n\nRome controls the spiritual loyalty of half your empire.`,
+      choices: [
+        { label: '🕊 Offer the Pope Protection — and a Price', sub: 'Faith is an asset; use it without destroying it',
+          effect: () => { res.morale = Math.min(100,res.morale+18); T.find(t=>t.name==='Rome').cost=Math.max(1,T.find(t=>t.name==='Rome').cost-4); storyPath.push('pope_alliance'); res.gold+=500; },
+          outcome: 'A concordat is signed in a side room. The Pope will not call crusade; you will not sack Rome. The pulpits of France become, quietly, instruments of Imperial morale. The men fight better when they believe God has no objection. <em>(+18 Morale · +500 Gold · Rome cost −4 · spiritual legitimacy)</em>' },
+        { label: '⚔ Take Rome — The Pope Will Adapt', sub: 'Every institution bends to military reality eventually',
+          effect: () => { T.find(t=>t.name==='Rome').owner='player'; T.find(t=>t.name==='Rome').status='conquered'; res.morale=Math.max(0,res.morale-10); res.gold+=T.find(t=>t.name==='Rome').gold; storyPath.push('pope_defied'); },
+          outcome: 'Rome falls in three days. The Pope issues an excommunication from Castel Sant\'Angelo. You read the document, sign a receipt for it, and file it. What surprises you is how much it costs you in the countryside of Spain and southern France, where men who will die for the emperor will not die against the Holy Father. <em>(Rome conquered · +gold · −10 Morale · long-term unrest planted)</em>' },
+        { label: '📜 Invite Him to Crown You — Again', sub: 'Let the Church legitimise the empire',
+          effect: () => { mloy('josephine',+10); res.morale=Math.min(100,res.morale+20); storyPath.push('pope_coronation'); res.gold-=300; T.filter(t=>t.owner==='enemy').forEach(t=>t.cost=Math.max(1,t.cost-1)); },
+          outcome: 'The Pope arrives in Paris with his full retinue. You crown yourself — he blesses what is already done. The image travels across Europe: the conqueror who wanted God\'s approval as well as history\'s. Several wavering neutral princes accept your terms that week. <em>(+20 Morale · −300 Gold · all enemy costs −1 · legitimacy that gold cannot buy)</em>' },
+      ],
+      trigger: () => !fired.has('pope_gambit') && T.find(t=>t.name==='Rome')?.status !== 'unvisited',
+    },
+
+    // ── C8. Marshal Defection Risk ───────────────────────────
+    {
+      id: 'marshal_defection',
+      seal: '⚠', source: 'Fouché\'s Secret Police — Most Urgent',
+      title: 'A Marshal Considers His Options',
+      body: `The report is stark: one of your marshals has received, and not immediately refused, a letter from the Allied powers. The letter offered him a dukedom, his family\'s safety, and the suggestion that the emperor\'s situation is "temporary."\n\nFouché does not know if he will act on it. He does know that loyalty, like a blade, must be maintained — or it rusts.`,
+      choices: [
+        { label: '🤝 Speak to Him Directly — Man to Man', sub: 'Give him a reason to stay that the Allies cannot match',
+          effect: () => {
+            const m = storyPath.includes('murat_refused') ? 'murat' : storyPath.includes('berthier_distanced') ? 'berthier' : 'talleyrand';
+            mloy(m, +30); res.morale=Math.min(100,res.morale+8); storyPath.push('defection_prevented_'+m);
+          },
+          outcome: 'You ride to his quarters alone, no guards, no ceremony. You talk for three hours. What was said remains between you. He burns the letter in your presence. Whatever the Allies offered, it was not this: to be known, and trusted anyway. <em>(+8 Morale · loyalty crisis resolved · a bond forged in honesty)</em>' },
+        { label: '🕵 Watch and Wait — Let Him Choose', sub: 'If he defects, you\'ll know his price; if he stays, he chose you',
+          effect: () => { res.gold += 400; storyPath.push('defection_watched'); },
+          outcome: 'You pull his assignment to a quieter front. He stays. Whether from loyalty, fear, or calculation — you never know. Some things are better not examined too closely. <em>(+400 Gold · crisis deferred rather than resolved)</em>' },
+        { label: '⚔ Relieve Him of Command — No Second Chances', sub: 'One disloyal marshal is a threat; a lesson costs less',
+          effect: () => {
+            const m = storyPath.includes('murat_refused') ? 'murat' : 'berthier';
+            mkill(m); res.morale=Math.max(0,res.morale-20); res.army-=3000; storyPath.push('defection_purge');
+          },
+          outcome: 'The order is given quietly. He is retired to a country estate. The army notices. Men who had never considered disloyalty begin to consider what their own retirement might look like. The campaign continues. The Grande Armée marches a little differently now. <em>(−20 Morale · −3,000 from officer corps disruption · no one else dares, and no one else trusts)</em>' },
+      ],
+      trigger: () => !fired.has('marshal_defection') && res.turn >= 9 &&
+        (MARSHALS.murat.loyalty < 60 || MARSHALS.berthier.loyalty < 50 || MARSHALS.talleyrand.loyalty < 40),
+    },
+
+    // ── C9. The Emperor's Doubt ──────────────────────────────
+    {
+      id: 'emperors_doubt',
+      seal: '🌑', source: 'No source — these thoughts have no author',
+      title: 'The Night Before the Last Battle',
+      body: `It is three in the morning. The camp is asleep.\n\nYou have been standing at the map for two hours. Not studying it — you know it. Just standing. The candle has burned to a stub.\n\n<em>You think: what was the first thing I wanted? Before the crown. Before the campaigns. Before France itself needed saving. There was a boy from Corsica who read too many books about Rome and believed, completely, that history was something men made with their hands.</em>\n\nYou still believe that. You are less certain it is a comfort.`,
+      choices: [
+        { label: '🔥 The Certainty Is the Point — Forward', sub: 'Doubt is for men who have not yet committed. You have committed.',
+          effect: () => { res.morale=Math.min(100,res.morale+20); res.army+=5000; storyPath.push('doubt_overcome'); },
+          outcome: 'You take the candle stub and light a fresh one. You call for your secretary. You dictate orders until dawn — clean, precise, brilliant orders. The doubt was real. So is this. Both things are true, and only one of them commands armies. <em>(+20 Morale · +5,000 — the Grande Armée fights best when the Emperor is certain)</em>' },
+        { label: '✍ Write It Down — The Honest Account', sub: 'Posterity deserves the truth about what this cost',
+          effect: () => { res.morale=Math.min(100,res.morale+10); storyPath.push('doubt_recorded'); mloy('josephine',+15); mloy('berthier',+10); },
+          outcome: 'You write for an hour — not orders, but something else. It will be found after everything else is over, and historians will argue about it for centuries. What matters now is that writing it made something easier. <em>(+10 Morale · the memoirs are begun · those who know you, trust you more)</em>' },
+        { label: '🛌 Sleep — The Body Knows What the Mind Forgets', sub: 'Even emperors need four hours',
+          effect: () => { res.morale=Math.min(100,res.morale+14); res.army+=2000; },
+          outcome: 'You sleep. You dream of the sea, which you have not seen in two years. You wake at six, completely certain of three things that were unclear the night before. The body is sometimes wiser than the crown. <em>(+14 Morale · +2,000 from a rested commander\'s clarity)</em>' },
+      ],
+      trigger: () => !fired.has('emperors_doubt') && res.turn >= 10 && T.filter(t=>t.owner==='player').length >= 10,
+    },
+
+    // ── C10. Territory flavour: Madrid ───────────────────────
+    {
+      id: 'madrid_falls',
+      seal: '🌹', source: 'Dispatch from the Iberian Front',
+      title: 'Spain Does Not Kneel',
+      body: `Madrid has fallen. The Spanish court has fled. The city is yours in every way that can be measured on a map.\n\nBut the streets are wrong. The conquered cities of central Europe were afraid — Spanish eyes are something else. Not afraid. <em>Waiting.</em>\n\nYour general writes: "The army won the city. I am less certain the city knows this."`,
+      choices: [
+        { label: '🤝 Rule Generously — Win the People, Not Just the Land', sub: 'An occupied city is not the same as a loyal one',
+          effect: () => { res.morale=Math.min(100,res.morale+12); T.find(t=>t.name==='Madrid').units=Math.floor(T.find(t=>t.name==='Madrid').units*.5); storyPath.push('spain_gentle'); res.gold+=400; },
+          outcome: 'Spanish priests are left in their churches. Markets are permitted. The occupation is firm but not brutal. Madrid does not love you — but it begins, slowly, to work. <em>(+12 Morale · +400 Gold from stable governance · garrison cost halved)</em>' },
+        { label: '🏰 Garrison Heavy — Spain Respects Strength', sub: 'A large enough boot heel ends all questions',
+          effect: () => { res.army-=2000; res.gold+=700; storyPath.push('spain_iron'); },
+          outcome: 'Twenty thousand men hold the capital. The city is quiet. Elsewhere in Spain — in the hills, in the villages, in the passes — something else begins. You will not feel it for months, and then all at once. <em>(+700 Gold · −2,000 garrisoned · the guerrilla is born, quietly, in Castile)</em>' },
+        { label: '👑 Install Joseph — Give Spain a Bonaparte King', sub: 'Let your brother wear the crown; your hands stay clean',
+          effect: () => { mloy('murat',-10); res.gold+=500; res.morale=Math.max(0,res.morale-5); storyPath.push('spain_joseph'); },
+          outcome: 'Joseph Bonaparte is declared King of Spain. He is a decent man and a poor king. He writes you letters asking for advice. The Spanish write a Constitution around him. You are unsure if this is success or a slow disaster wearing a crown. <em>(+500 Gold · −5 Morale · Murat displeased — he wanted this one)</em>' },
+      ],
+      trigger: () => !fired.has('madrid_falls') && T.find(t=>t.name==='Madrid')?.owner==='player',
+    },
+
+    // ── C11. The Road Home ───────────────────────────────────
+    {
+      id: 'road_home',
+      seal: '🌅', source: 'Personal Journal — Undated',
+      title: 'What Victory Actually Looks Like',
+      body: `You have not been to Paris in fourteen months.\n\nA courier brings news from the city — not military intelligence, just news. A new opera has opened. The market at Les Halles is full. Children are being named Napoleon and Josephine in the arrondissements.\n\nSomewhere between the maps and the dispatches, France has been living. Building. Arguing. Growing. The empire is not just the army's achievement — it is also the baker who feeds it, the engineer who bridges it, the lawyer who legitimises it.\n\n<em>You wonder if they know what it costs.</em>`,
+      choices: [
+        { label: '📣 Publish an Imperial Bulletin — Let France Know', sub: 'The nation that sacrifices deserves to know what for',
+          effect: () => { res.morale=Math.min(100,res.morale+15); res.gold+=300; mloy('josephine',+10); storyPath.push('home_published'); },
+          outcome: 'The Bulletin is read in every town square. A widow in Lyon reads that her son\'s regiment took Brussels. A father in Toulouse hears his daughter\'s city is safe. France does not just admire the Emperor — for a week, it understands him. <em>(+15 Morale · +300 Gold from renewed bond subscriptions)</em>' },
+        { label: '🏛 Commission a Monument — Let Stone Remember', sub: 'Great empires are measured by what they build',
+          effect: () => { res.gold-=400; res.morale=Math.min(100,res.morale+20); storyPath.push('home_monument'); },
+          outcome: 'Architects receive commissions. An arch. A column. A boulevard. Paris begins to look like the capital of something permanent. Men fight differently when they believe they are building something that will outlast them. <em>(+20 Morale · −400 Gold · the Arc de Triomphe exists because of this moment)</em>' },
+        { label: '⏩ There Is No Time for Sentiment — Press On', sub: 'The campaign cannot pause for nostalgia',
+          effect: () => { res.army+=3000; storyPath.push('home_ignored'); mloy('josephine',-10); },
+          outcome: 'You fold the courier\'s letter and use the back of it to draft troop movements. The baker, the engineer, the lawyer — they will understand, when it is over. Or they will not, and it will not matter, because it will be over. <em>(+3,000 Army · the price of focus)</em>' },
+      ],
+      trigger: () => !fired.has('road_home') && res.turn >= 11 && T.filter(t=>t.owner==='player').length >= 11,
+    },
+
+  ]; // ← EVENTS array closes here (all 20 events inside)
 
   // ── Engine ────────────────────────────────────────────────
   function check(){
@@ -1297,6 +1630,7 @@ const Story = (() => {
     document.getElementById('story-modal').style.display = 'none';
     document.getElementById('story-choices').style.display = 'flex'; // reset for next event
     isOpen = false;
+    updateMarshals();
     if(queue.length) setTimeout(()=>show(queue.shift()), 400);
   }
 
@@ -1305,13 +1639,70 @@ const Story = (() => {
     queue = [];
     isOpen = false;
     storyPath = [];
+    Object.assign(MARSHALS, {
+      murat:     { name:'Murat',     title:'King of Naples',       loyalty:80, alive:true, glory:0 },
+      ney:       { name:'Ney',       title:'Prince of the Moskva', loyalty:90, alive:true, glory:0 },
+      berthier:  { name:'Berthier',  title:'Chief of Staff',       loyalty:75, alive:true, glory:0 },
+      talleyrand:{ name:'Talleyrand',title:'Foreign Minister',     loyalty:55, alive:true, glory:0 },
+      josephine: { name:'Josephine', title:'Empress',              loyalty:70, alive:true, glory:0 },
+    });
     document.getElementById('story-modal').style.display = 'none';
     document.getElementById('chapter-hud').textContent = '⚜  CHAPTER I — THE EAGLE AWAKENS';
+    updateMarshals();
+  }
+
+  const MARSHAL_EMOJI = {
+    murat:'🐎', ney:'🗡', berthier:'📜', talleyrand:'🕯', josephine:'💌'
+  };
+
+  function marshalStatus(m){
+    if(!m.alive)   return {cls:'dead',     label:'Fallen'};
+    if(m.glory>=40) return {cls:'legend',   label:'Legend'};
+    if(m.loyalty>=75) return {cls:'loyal',  label:'Loyal'};
+    if(m.loyalty>=45) return {cls:'wavering',label:'Wavering'};
+    return                   {cls:'hostile', label:'Hostile'};
+  }
+
+  function updateMarshals(){
+    const list = document.getElementById('marshal-list');
+    if(!list) return;
+    list.innerHTML = '';
+    Object.entries(MARSHALS).forEach(([id, m]) => {
+      const st = marshalStatus(m);
+      const row = document.createElement('div');
+      row.className = 'marshal-row';
+      row.innerHTML = `
+        <div class="m-avatar${m.alive?'':' dead'}">${MARSHAL_EMOJI[id]||'⚜'}</div>
+        <div class="m-info">
+          <div class="m-name">${m.name}</div>
+          <div class="m-title">${m.title}</div>
+        </div>
+        <div class="m-bars">
+          <div class="m-bar-wrap" title="Loyalty: ${m.loyalty}%">
+            <div class="m-bar-fill loyalty" style="width:${m.loyalty}%"></div>
+          </div>
+          <div class="m-bar-wrap" title="Glory: ${m.glory}">
+            <div class="m-bar-fill glory" style="width:${Math.min(100, m.glory*2)}%"></div>
+          </div>
+          <div class="m-legend"><span>Loy</span><span>Glo</span></div>
+        </div>
+        <span class="m-status ${st.cls}">${st.label}</span>`;
+      list.appendChild(row);
+    });
+  }
+
+  function getMarshalSummary(){
+    const alive   = Object.values(MARSHALS).filter(m=>m.alive);
+    const loyal   = alive.filter(m=>m.loyalty>=75).map(m=>m.name);
+    const legends = alive.filter(m=>m.glory>=40).map(m=>m.name);
+    const hostile = alive.filter(m=>m.loyalty<45).map(m=>m.name);
+    const fallen  = Object.values(MARSHALS).filter(m=>!m.alive).map(m=>m.name);
+    return { loyal, legends, hostile, fallen };
   }
 
   function getPath(){ return storyPath; }
 
-  return { check, close, reset, getPath, updateChapter };
+  return { check, close, reset, getPath, updateChapter, updateMarshals, getMarshalSummary };
 })();
 
 </script>

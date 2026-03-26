@@ -1,33 +1,54 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# bfs.py  ·  Crown & Conquest – DAA-IV-T241
+# Breadth-First Search — territory exploration
+# Time Complexity:  O(V + E)   where V = territories, E = borders
+# Space Complexity: O(V)       for the visited set + queue
+# ─────────────────────────────────────────────────────────────────────────────
+
 from collections import deque
 
-def bfs(graph, start):
+
+def bfs(graph, start: str) -> dict:
     """
-    Breadth-First Search traversal from a starting node.
-    Explores the map level by level (nearest neighbors first).
-    Time complexity: O(V + E)
+    Perform BFS from `start` over the MapGraph.
 
-    Args:
-        graph: MapGraph object with .graph dict and .get_neighbors()
-        start: Starting country name (string)
-
-    Returns:
-        List of countries visited in BFS order
+    Returns a dict with:
+      - 'order'   : list of territory names in BFS visit order
+      - 'levels'  : dict mapping territory name → BFS depth (distance in hops)
+      - 'parents' : dict mapping territory name → its BFS-tree parent
     """
-    if start not in graph.graph:
-        return []
-
-    visited = set()
-    queue = deque([start])
-    visited.add(start)
-    result = []
+    visited = {start}
+    queue   = deque([start])
+    order   = []
+    levels  = {start: 0}
+    parents = {start: None}
 
     while queue:
         current = queue.popleft()
-        result.append(current)
+        order.append(current)
 
-        for neighbor, _distance in graph.get_neighbors(current):
-            if neighbor not in visited:
-                visited.add(neighbor)
-                queue.append(neighbor)
+        for neighbour, _weight in graph.get_neighbors(current):
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+                levels[neighbour]  = levels[current] + 1
+                parents[neighbour] = current
 
-    return result
+    return {
+        "order":   order,
+        "levels":  levels,
+        "parents": parents,
+    }
+
+
+def bfs_reachable_from_controlled(graph, controlled: set) -> list:
+    """
+    Return all territories reachable (adjacent) to any currently controlled
+    territory that are NOT yet controlled.  Used to decide legal invasion targets.
+    """
+    reachable = []
+    for city in controlled:
+        for neighbour, _w in graph.get_neighbors(city):
+            if neighbour not in controlled and neighbour not in reachable:
+                reachable.append(neighbour)
+    return reachable
