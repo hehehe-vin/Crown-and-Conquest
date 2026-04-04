@@ -722,3 +722,69 @@ input[type=range]::-webkit-slider-thumb {
   padding: 7px 4px;
   font-size: .58rem;
 }
+
+/* ════════════════════════════════════
+   RESPONSIVE — MOBILE (≤768px)
+════════════════════════════════════ */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+    --log-w: 0px;
+    --topbar-h: 38px;
+  }
+
+  body { overflow-y: auto; overflow-x: hidden; }
+
+  #topbar { padding: 0 8px; height: 38px; }
+  .brand { font-size: .7rem; letter-spacing: .1em; }
+  #res-bar { gap: 6px; }
+  .res-item .res-val { font-size: .72rem; }
+  .res-item .res-lbl { font-size: .42rem; }
+  #chapter-hud { font-size: .46rem; letter-spacing: .08em; }
+
+  #sidebar { display: none; }
+  #logbar  { display: none; }
+  #mobile-bar { display: flex; }
+
+  #main {
+    margin-left: 0; margin-right: 0;
+    padding-top: 42px;
+  }
+
+  #map-wrap { height: calc(100vh - 42px - 48px); }
+
+  .toast {
+    font-size: .76rem;
+    max-width: 85%;
+    left: 50%; transform: translateX(-50%);
+  }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — TABLET (769px — 1024px)
+════════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --sidebar-w: 170px;
+    --log-w: 160px;
+  }
+
+  .brand { font-size: .78rem; }
+  .res-item .res-val { font-size: .78rem; }
+  .act-btn { font-size: .58rem; padding: 7px 4px; }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — LARGE SCREENS (1400px+)
+════════════════════════════════════ */
+@media (min-width: 1400px) {
+  :root {
+    --sidebar-w: 280px;
+    --log-w: 260px;
+  }
+
+  body { font-size: 15px; }
+  .brand { font-size: 1.05rem; }
+  .res-item .res-val { font-size: 1rem; }
+  .act-btn { font-size: .72rem; }
+}

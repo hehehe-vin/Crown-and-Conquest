@@ -17,7 +17,7 @@
   border: 1px solid rgba(233,193,118,.26);
   border-radius: 4px;
   padding: clamp(16px,2.5vw,30px);
-  max-width: 460px; width: 92%;
+  max-width: 560px; width: 94%;
   box-shadow: 0 0 60px rgba(233,193,118,.06), 0 40px 70px rgba(0,0,0,.8);
   text-align: center; position: relative;
   max-height: 90vh; overflow-y: auto;
@@ -36,7 +36,7 @@
 
 .mtitle {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1rem,1.4vw,1.38rem);
+  font-size: clamp(1.15rem,1.5vw,1.5rem);
   font-weight: 900;
   color: var(--gold);
   letter-spacing: .1em;
@@ -45,20 +45,20 @@
 
 .msub {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.76rem,.86vw,.86rem);
+  font-size: clamp(.88rem,1vw,1rem);
   color: var(--fog);
   margin-bottom: 16px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .mbtn {
   display: inline-block;
-  padding: 9px 22px; margin: 3px;
+  padding: 11px 26px; margin: 4px;
   background: linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
   border: 1px solid rgba(233,193,118,.26);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .76rem; letter-spacing: .12em;
+  font-size: .84rem; letter-spacing: .12em;
   color: var(--gold2); cursor: pointer;
   transition: var(--trans);
   text-transform: uppercase;
@@ -84,21 +84,21 @@
   background: rgba(0,0,0,.3);
   border: 1px solid rgba(233,193,118,.12);
   border-radius: var(--radius);
-  padding: 8px 12px;
-  margin: 8px 0;
+  padding: 10px 14px;
+  margin: 10px 0;
 }
 
 .odds-label {
   font-family: 'Cinzel', serif;
-  font-size: .58rem;
-  letter-spacing: .18em;
+  font-size: .78rem;
+  letter-spacing: .14em;
   color: var(--fog);
   margin-bottom: 5px;
   text-transform: uppercase;
 }
 
 .odds-bar-bg {
-  height: 6px;
+  height: 8px;
   background: rgba(255,255,255,.08);
   border-radius: 3px;
   overflow: hidden;
@@ -115,14 +115,14 @@
   display: flex;
   justify-content: space-between;
   font-family: 'Cinzel', serif;
-  font-size: .62rem;
+  font-size: .8rem;
 }
 
 /* Army commitment selector */
 .commit-title {
   font-family: 'Cinzel', serif;
-  font-size: .58rem;
-  letter-spacing: .16em;
+  font-size: .78rem;
+  letter-spacing: .12em;
   color: var(--fog);
   text-transform: uppercase;
   margin: 10px 0 5px;
@@ -135,12 +135,12 @@
 
 .commit-btn {
   flex: 1;
-  padding: 6px 4px;
+  padding: 9px 6px;
   background: rgba(233,193,118,.04);
   border: 1px solid rgba(233,193,118,.14);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .6rem;
+  font-size: .82rem;
   color: var(--parch);
   cursor: pointer;
   transition: var(--trans);
@@ -163,12 +163,12 @@
 
 .marshal-ability-btn {
   flex: 1;
-  padding: 5px 6px;
+  padding: 8px 8px;
   background: rgba(26,58,110,.18);
   border: 1px solid rgba(138,180,224,.16);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .54rem; letter-spacing: .04em;
+  font-size: .74rem; letter-spacing: .04em;
   color: #8ab4e0; cursor: pointer;
   transition: var(--trans);
   text-align: center;
@@ -197,13 +197,13 @@
 .bside { text-align: center; }
 
 .bside-label {
-  font-size: .6rem; letter-spacing: .14em;
-  opacity: .6; margin-bottom: 3px;
+  font-size: .8rem; letter-spacing: .1em;
+  opacity: .65; margin-bottom: 4px;
   font-family: 'Cinzel', serif;
 }
 
 .bside-power {
-  font-size: 1.6rem;
+  font-size: 1.9rem;
   font-weight: 700; font-family: 'Cinzel', serif;
 }
 
@@ -240,7 +240,7 @@
   min-height: 32px;
   display: flex; align-items: center; justify-content: center;
   font-family: 'IM Fell English', serif;
-  font-size: .95rem; margin: 8px 0; font-style: italic;
+  font-size: 1.1rem; margin: 10px 0; font-style: italic;
 }
 
 .bgood    { color: var(--success); }
@@ -256,7 +256,7 @@
   margin: 8px 0;
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: .86rem;
+  font-size: .96rem;
   color: #d0a0d0;
   display: none;
 }
@@ -411,7 +411,7 @@
 #conquest-modal { z-index: 460; }
 
 .conquest-inner {
-  max-width: 540px; width: 94%;
+  max-width: 620px; width: 94%;
   text-align: center; position: relative;
   background: linear-gradient(155deg,#1a0d06 0%,#0e0604 55%,#160a06 100%);
   border: 1px solid rgba(233,193,118,.32);
@@ -438,7 +438,7 @@
 
 .conquest-title {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1rem,1.3vw,1.3rem);
+  font-size: clamp(1.1rem,1.4vw,1.4rem);
   font-weight: 900;
   color: var(--gold);
   letter-spacing: .15em;
@@ -449,7 +449,7 @@
 
 .conquest-body {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.84rem,.94vw,.94rem);
+  font-size: clamp(.95rem,1.08vw,1.08rem);
   color: var(--parch);
   line-height: 1.78;
   font-style: italic;
@@ -460,11 +460,14 @@
   animation: cq-fade-in .6s ease .15s both;
 }
 
-.conquest-body em { color: var(--gold2); font-style: normal; }
+.conquest-body em {
+  color: var(--gold2); font-style: normal;
+  display: block; margin-top: 10px;
+}
 
 .conquest-sensory {
   font-family: 'IM Fell English', serif;
-  font-size: .76rem;
+  font-size: .88rem;
   color: var(--parch2);
   font-style: italic;
   text-align: center;
@@ -489,7 +492,7 @@
   border: 1px solid rgba(233,193,118,.14);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .6rem;
+  font-size: .72rem;
   letter-spacing: .04em;
 }
 
@@ -504,7 +507,7 @@
   margin: 8px 0;
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: .84rem;
+  font-size: .96rem;
   color: #d0a0d0;
   display: none;
   animation: cq-fade-in .5s ease .55s both;
@@ -522,7 +525,7 @@
   text-align: left;
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: .82rem;
+  font-size: .96rem;
   color: var(--parch);
   line-height: 1.6;
   animation: cq-fade-in .5s ease .6s both;
@@ -530,7 +533,7 @@
 
 .conquest-marshal .cq-marshal-name {
   font-family: 'Cinzel', serif;
-  font-size: .58rem;
+  font-size: .7rem;
   font-style: normal;
   color: var(--gold);
   letter-spacing: .1em;
@@ -548,7 +551,7 @@
 #defeat-modal { z-index: 460; }
 
 .defeat-inner {
-  max-width: 480px; width: 92%;
+  max-width: 580px; width: 94%;
   text-align: center;
   background: linear-gradient(155deg,#1a0808 0%,#0e0505 55%,#160808 100%);
   border: 1px solid rgba(248,113,113,.2);
@@ -560,7 +563,7 @@
 
 .defeat-body {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.84rem,.92vw,.92rem);
+  font-size: clamp(.95rem,1.06vw,1.06rem);
   color: var(--parch);
   line-height: 1.72;
   font-style: italic;
@@ -588,7 +591,7 @@
   text-align: left;
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: .8rem;
+  font-size: .94rem;
   color: #e07070;
   line-height: 1.5;
   display: none;
@@ -641,7 +644,7 @@
 
 .chapter-name {
   font-family: 'Cinzel', serif;
-  font-size: clamp(.7rem,1vw,1rem);
+  font-size: clamp(.88rem,1.15vw,1.15rem);
   font-weight: 900;
   color: var(--gold2);
   letter-spacing: .25em;
@@ -655,7 +658,7 @@
 
 .chapter-epigraph {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.78rem,.9vw,.9rem);
+  font-size: clamp(.92rem,1.05vw,1.05rem);
   color: var(--parch2);
   font-style: italic;
   margin-top: 18px;
@@ -696,7 +699,7 @@
 
 .win-epigraph {
   font-family: 'IM Fell English', serif;
-  font-size: .82rem;
+  font-size: .96rem;
   color: var(--parch2);
   font-style: italic;
   margin: 6px 0 14px;
@@ -705,7 +708,7 @@
 
 .win-narrative {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.84rem,.94vw,.94rem);
+  font-size: clamp(.95rem,1.08vw,1.08rem);
   color: var(--parch);
   line-height: 1.82;
   font-style: italic;
@@ -753,13 +756,13 @@
 
 .win-marshal-beat .wmb-name {
   font-family: 'Cinzel', serif;
-  font-size: .66rem;
+  font-size: .78rem;
   color: var(--gold2);
   letter-spacing: .06em;
 }
 
 .win-marshal-beat .wmb-status {
-  font-size: .48rem;
+  font-size: .58rem;
   padding: 1px 5px;
   border-radius: 2px;
   font-family: 'Cinzel', serif;
@@ -767,7 +770,7 @@
 
 .win-marshal-beat .wmb-prose {
   font-family: 'IM Fell English', serif;
-  font-size: .82rem;
+  font-size: .96rem;
   color: var(--parch);
   font-style: italic;
   line-height: 1.6;
@@ -775,7 +778,7 @@
 
 .win-stats-bar {
   font-family: 'Cinzel', serif;
-  font-size: .56rem;
+  font-size: .68rem;
   color: var(--fog);
   letter-spacing: .08em;
   text-align: center;
@@ -785,7 +788,7 @@
 
 .win-final-line {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.92rem,1.1vw,1.1rem);
+  font-size: clamp(1.05rem,1.2vw,1.2rem);
   color: var(--gold);
   font-style: italic;
   text-align: center;
@@ -796,4 +799,89 @@
 
 .win-btn {
   margin-top: 10px;
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — MOBILE (≤768px)
+════════════════════════════════════ */
+@media (max-width: 768px) {
+  .modal { max-width: 96%; width: 96%; padding: 16px 14px; }
+  .story-inner { max-width: 96%; padding: 16px 14px; }
+  .conquest-inner { max-width: 96%; padding: 16px 14px; }
+  .defeat-inner  { max-width: 96%; padding: 16px 14px; }
+  .win-inner     { max-width: 96%; padding: 16px 14px; }
+
+  .mcrest, .conquest-seal { font-size: 2rem; }
+  .win-crown { font-size: 2.4rem; }
+  .story-ornament { font-size: 1.8rem; }
+
+  .mtitle { font-size: 1.1rem; }
+  .story-title { font-size: 1.15rem; }
+  .conquest-title { font-size: 1.1rem; }
+  .win-title { font-size: 1.15rem !important; }
+
+  .story-body { font-size: .95rem; padding-left: 10px; }
+  .conquest-body { font-size: .95rem; padding-left: 10px; }
+  .defeat-body { font-size: .95rem; padding-left: 10px; }
+  .win-narrative { font-size: .95rem; }
+  .win-marshal-beat .wmb-prose { font-size: .92rem; }
+  .win-final-line { font-size: 1rem; }
+
+  .sc-label { font-size: .78rem; }
+  .sc-sub { font-size: .78rem; }
+  .story-consequence { font-size: .95rem; }
+
+  .commit-btns { flex-wrap: wrap; }
+  .commit-btn { font-size: .68rem; padding: 8px 4px; }
+  .marshal-ability-row { flex-direction: column; }
+  .marshal-ability-btn { font-size: .62rem; padding: 6px 8px; }
+
+  .battle-vs { flex-direction: column; gap: 6px; }
+  .bside-power { font-size: 1.3rem; }
+
+  .chapter-numeral { font-size: 2.8rem; }
+  .chapter-name { font-size: .85rem; letter-spacing: .15em; }
+  .chapter-epigraph { font-size: .9rem; }
+
+  .conquest-marshal { font-size: .92rem; }
+  .defeat-marshal { font-size: .88rem; }
+  .cq-res-chip { font-size: .68rem; padding: 4px 8px; }
+  .conquest-loot { font-size: .92rem; }
+  .loot-result { font-size: .92rem; }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — TABLET (769px — 1024px)
+════════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .modal { max-width: 520px; }
+  .story-inner { max-width: 560px; }
+  .conquest-inner { max-width: 560px; }
+  .defeat-inner { max-width: 520px; }
+  .win-inner { max-width: 580px; }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — LARGE SCREENS (1400px+)
+════════════════════════════════════ */
+@media (min-width: 1400px) {
+  .story-inner { max-width: 680px; }
+  .conquest-inner { max-width: 680px; }
+  .win-inner { max-width: 720px; }
+  .defeat-inner { max-width: 640px; }
+
+  .story-body { font-size: 1.12rem; }
+  .conquest-body { font-size: 1.12rem; }
+  .defeat-body { font-size: 1.1rem; }
+  .win-narrative { font-size: 1.12rem; }
+  .win-marshal-beat .wmb-prose { font-size: 1rem; }
+  .win-final-line { font-size: 1.25rem; }
+
+  .story-title { font-size: 1.5rem; }
+  .conquest-title { font-size: 1.5rem; }
+  .win-title { font-size: 1.5rem !important; }
+
+  .story-consequence { font-size: 1.08rem; }
+  .sc-label { font-size: .9rem; }
+  .sc-sub { font-size: .88rem; }
 }
