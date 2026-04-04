@@ -1,22 +1,14 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # bfs.py  ·  Crown & Conquest – DAA-IV-T241
 # Breadth-First Search — territory exploration
-# Time Complexity:  O(V + E)   where V = territories, E = borders
-# Space Complexity: O(V)       for the visited set + queue
+# Time:  O(V + E)   Space: O(V)
 # ─────────────────────────────────────────────────────────────────────────────
 
 from collections import deque
 
 
 def bfs(graph, start: str) -> dict:
-    """
-    Perform BFS from `start` over the MapGraph.
-
-    Returns a dict with:
-      - 'order'   : list of territory names in BFS visit order
-      - 'levels'  : dict mapping territory name → BFS depth (distance in hops)
-      - 'parents' : dict mapping territory name → its BFS-tree parent
-    """
+    """BFS from `start`. Returns order, levels (hop distances), and parent tree."""
     visited = {start}
     queue   = deque([start])
     order   = []
@@ -26,7 +18,6 @@ def bfs(graph, start: str) -> dict:
     while queue:
         current = queue.popleft()
         order.append(current)
-
         for neighbour, _weight in graph.get_neighbors(current):
             if neighbour not in visited:
                 visited.add(neighbour)
@@ -34,18 +25,11 @@ def bfs(graph, start: str) -> dict:
                 levels[neighbour]  = levels[current] + 1
                 parents[neighbour] = current
 
-    return {
-        "order":   order,
-        "levels":  levels,
-        "parents": parents,
-    }
+    return {"order": order, "levels": levels, "parents": parents}
 
 
 def bfs_reachable_from_controlled(graph, controlled: set) -> list:
-    """
-    Return all territories reachable (adjacent) to any currently controlled
-    territory that are NOT yet controlled.  Used to decide legal invasion targets.
-    """
+    """Return all uncontrolled territories adjacent to any controlled territory."""
     reachable = []
     for city in controlled:
         for neighbour, _w in graph.get_neighbors(city):

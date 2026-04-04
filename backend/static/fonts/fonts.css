@@ -1,0 +1,109 @@
+/* ── Cinzel ─────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlp2gwHKFkZgtmSR3NB0oRJfYAhTM_I.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('Ktk1ALSLW8zDe0rthJysWrnLsAzHEKOY.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF;
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('wlp2gwHKFkZgtmSR3NB0oRJfYQhTM_I.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('Ktk3ALSLW8zDe0rthJysWrnLsAzHFZOafYs.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF;
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('wlp2gwHKFkZgtmSR3NB0oRJfbwhT.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+
+/* ── Crimson Text ────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlpogwHKFkZgtmSR3NB0oRJfajhRK_Y.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('8vIJ7ww63mVu7gt79mT7.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlpogwHKFkZgtmSR3NB0oRJfajhfK_Zt3Q.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlpogwHKFkZgtmSR3NB0oRJfajheK_Zt3Q.woff2') format('woff2');
+  unicode-range: U+0100-024F;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('8vIJ7ww63mVu7gt7-GT7LEc.woff2') format('woff2');
+  unicode-range: U+0100-024F;
+}
+
+/* ── IM Fell English ─────────────────────────────────────────── */
+@font-face {
+  font-family: 'IM Fell English';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlppgwHKFkZgtmSR3NB0oRJXsCxGDNNQ.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'IM Fell English';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlppgwHKFkZgtmSR3NB0oRJXsCxGAtNQ5LE.woff2') format('woff2');
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: 'IM Fell English';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('wlppgwHKFkZgtmSR3NB0oRJXsCxGA9NQ5LE.woff2') format('woff2');
+  unicode-range: U+0100-024F;
+}

@@ -1,0 +1,164 @@
+/* ══════════════════════════════════════════════
+   map.css  ·  Crown & Conquest — DAA-IV-T241
+   SVG map elements
+══════════════════════════════════════════════ */
+
+/* ── EDGES ── */
+.edge {
+  stroke-width: 1.8;
+  fill: none;
+  stroke-opacity: .45;
+  transition: stroke .3s, stroke-width .3s, stroke-opacity .3s;
+}
+
+.edge.frontier {
+  stroke-dasharray: 6 4;
+  animation: da 1s linear infinite;
+}
+
+@keyframes da { to { stroke-dashoffset: -20; } }
+
+.edge.active-path {
+  stroke-width: 3;
+  stroke-opacity: .92;
+}
+
+.edge.traversed {
+  stroke-width: 2.2;
+  stroke-opacity: .75;
+}
+
+/* ── NODES ── */
+circle.ncirc {
+  cursor: pointer;
+  transition: r .18s, fill .3s, stroke .3s, filter .3s;
+}
+
+circle.ncirc:hover {
+  filter: drop-shadow(0 0 7px rgba(233,193,118,.65));
+}
+
+/* States */
+g[data-state="conquered"] circle.ncirc {
+  fill: #2c4025;
+  stroke: #6a9a5a;
+  stroke-width: 2.2;
+}
+
+g[data-state="scouted"] circle.ncirc {
+  fill: #c5a059;
+  stroke: rgba(42,20,5,.55);
+  stroke-width: 1.8;
+}
+
+g[data-state="unvisited"] circle.ncirc {
+  fill: rgba(40,26,12,.7);
+  stroke: rgba(233,193,118,.18);
+  stroke-width: 1.2;
+}
+
+/* FOG state — truly hidden, silhouette only */
+g[data-state="fog"] circle.ncirc {
+  fill: rgba(20,12,5,.85);
+  stroke: rgba(158,144,128,.12);
+  stroke-width: 1;
+  filter: blur(.3px);
+}
+
+g[data-state="selected"] circle.ncirc {
+  fill: #7b1f1f;
+  stroke: var(--gold);
+  stroke-width: 2.8;
+  filter: drop-shadow(0 0 10px rgba(233,193,118,.5));
+}
+
+g[data-state="enemy"] circle.ncirc {
+  fill: #5c1010;
+  stroke: #e05050;
+  stroke-width: 1.8;
+}
+
+g[data-state="visiting"] circle.ncirc {
+  fill: #1a3a6e;
+  stroke: #8ab4e0;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 9px rgba(100,160,230,.55));
+}
+
+g[data-state="queued"] circle.ncirc {
+  fill: #3a2a00;
+  stroke: var(--gold);
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 7px rgba(233,193,118,.35));
+}
+
+g[data-state="greedy"] circle.ncirc {
+  fill: #5a1a5a;
+  stroke: #c080c0;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 9px rgba(160,80,160,.45));
+}
+
+/* Node labels */
+.nlabel {
+  pointer-events: none;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: #000;
+  stroke-width: 2.8px;
+  stroke-linejoin: round;
+}
+
+/* Fog label — question marks */
+.nlabel-fog {
+  pointer-events: none;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: rgba(158,144,128,.3);
+  paint-order: stroke;
+  stroke: #000;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.ewt {
+  font-family: 'Cinzel', serif;
+  font-size: 6.5px;
+  text-anchor: middle;
+  pointer-events: none;
+  fill: rgba(255,255,255,.6);
+  paint-order: stroke;
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+/* Paris pulse */
+@keyframes pulse {
+  0%,100% { r: 11; opacity: 1; }
+  50%      { r: 15; opacity: .5; }
+}
+.pulse-anim { animation: pulse 2s infinite; }
+
+/* Battle flash */
+@keyframes battle-flash {
+  0%   { opacity: 1; }
+  25%  { opacity: .3; }
+  50%  { opacity: 1; }
+  75%  { opacity: .3; }
+  100% { opacity: 1; }
+}
+.battle-flash { animation: battle-flash .4s ease 3; }
+
+/* Conquest glow */
+@keyframes conquest-glow {
+  0%   { filter: drop-shadow(0 0 6px rgba(110,231,183,.8)); }
+  50%  { filter: drop-shadow(0 0 18px rgba(110,231,183,.9)); }
+  100% { filter: drop-shadow(0 0 6px rgba(110,231,183,.3)); }
+}
+.conquest-flash { animation: conquest-glow .6s ease forwards; }

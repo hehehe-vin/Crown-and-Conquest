@@ -1,22 +1,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # decision_engine.py  ·  Crown & Conquest – DAA-IV-T241
-#
-# BUG FIXED: original code had `return` on its own line BEFORE the list,
-# so get_choices() always returned None (the list was unreachable dead code).
+# Context-sensitive strategic choices for the player
 # ─────────────────────────────────────────────────────────────────────────────
 
 
 class DecisionEngine:
 
     def get_choices(self, controlled: list, resources: dict) -> list:
-        """
-        Return context-sensitive strategic choices based on current game state.
-        `controlled` — list of territory names the player owns
-        `resources`  — dict with keys: army, gold, morale
-        """
+        """Return strategic choices based on current game state."""
         choices = []
 
-        # Always available
         choices.append({
             "action":      "reinforce",
             "label":       "Reinforce the Army",
@@ -25,7 +18,6 @@ class DecisionEngine:
             "gain_army":   3000,
         })
 
-        # Only if morale is low
         if resources.get("morale", 100) < 60:
             choices.append({
                 "action":      "boost_morale",
@@ -35,7 +27,6 @@ class DecisionEngine:
                 "gain_morale": 20,
             })
 
-        # Expansion choices — adjacent unconquered territories
         choices.append({
             "action":      "expand",
             "label":       "Press the Advance",
@@ -43,4 +34,4 @@ class DecisionEngine:
             "cost_gold":   0,
         })
 
-        return choices  # ← FIX: return is now on the SAME line as the value
+        return choices

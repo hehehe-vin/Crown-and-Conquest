@@ -1,20 +1,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # dfs.py  ·  Crown & Conquest – DAA-IV-T241
 # Depth-First Search — deep path traversal
-# Time Complexity:  O(V + E)
-# Space Complexity: O(V)  (recursion stack depth)
+# Time:  O(V + E)   Space: O(V)
 # ─────────────────────────────────────────────────────────────────────────────
 
 
 def dfs(graph, start: str, visited: set = None, order: list = None,
         parents: dict = None) -> dict:
-    """
-    Recursive DFS from `start`.
-
-    Returns a dict with:
-      - 'order'   : territories in DFS visit order
-      - 'parents' : DFS-tree parent for each node
-    """
+    """Recursive DFS from `start`. Returns order and parent tree."""
     if visited is None:
         visited = set()
         order   = []

@@ -1,0 +1,799 @@
+/* ══════════════════════════════════════════════
+   modals.css  ·  Crown & Conquest — DAA-IV-T241
+   All modal, story, and overlay styles
+══════════════════════════════════════════════ */
+
+/* ── SHARED BACKDROP ── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(5,2,1,.88);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+/* ── SHARED MODAL SHELL ── */
+.modal {
+  background: linear-gradient(160deg,#1c0907 0%,#120805 100%);
+  border: 1px solid rgba(233,193,118,.26);
+  border-radius: 4px;
+  padding: clamp(16px,2.5vw,30px);
+  max-width: 460px; width: 92%;
+  box-shadow: 0 0 60px rgba(233,193,118,.06), 0 40px 70px rgba(0,0,0,.8);
+  text-align: center; position: relative;
+  max-height: 90vh; overflow-y: auto;
+}
+
+.modal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+.mcrest {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.mtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem,1.4vw,1.38rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+}
+
+.msub {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.76rem,.86vw,.86rem);
+  color: var(--fog);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.mbtn {
+  display: inline-block;
+  padding: 9px 22px; margin: 3px;
+  background: linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
+  border: 1px solid rgba(233,193,118,.26);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif;
+  font-size: .76rem; letter-spacing: .12em;
+  color: var(--gold2); cursor: pointer;
+  transition: var(--trans);
+  text-transform: uppercase;
+}
+
+.mbtn:hover {
+  background: linear-gradient(135deg,var(--imperial2) 0%,var(--imperial) 100%);
+  transform: translateY(-2px);
+}
+
+.mbtn.sec {
+  background: rgba(233,193,118,.06);
+  border-color: rgba(233,193,118,.16);
+}
+
+/* ════════════════════════════════════
+   BATTLE MODAL
+════════════════════════════════════ */
+#battle-modal { display: none; }
+
+/* Win chance display */
+.battle-odds {
+  background: rgba(0,0,0,.3);
+  border: 1px solid rgba(233,193,118,.12);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+
+.odds-label {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem;
+  letter-spacing: .18em;
+  color: var(--fog);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.odds-bar-bg {
+  height: 6px;
+  background: rgba(255,255,255,.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.odds-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+.odds-numbers {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Cinzel', serif;
+  font-size: .62rem;
+}
+
+/* Army commitment selector */
+.commit-title {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem;
+  letter-spacing: .16em;
+  color: var(--fog);
+  text-transform: uppercase;
+  margin: 10px 0 5px;
+}
+
+.commit-btns {
+  display: flex; gap: 5px;
+  margin-bottom: 10px;
+}
+
+.commit-btn {
+  flex: 1;
+  padding: 6px 4px;
+  background: rgba(233,193,118,.04);
+  border: 1px solid rgba(233,193,118,.14);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif;
+  font-size: .6rem;
+  color: var(--parch);
+  cursor: pointer;
+  transition: var(--trans);
+  text-align: center;
+}
+
+.commit-btn:hover { border-color: rgba(233,193,118,.3); color: var(--gold2); }
+.commit-btn.active {
+  background: rgba(233,193,118,.12);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Marshal ability row */
+.marshal-ability-row {
+  display: flex; gap: 5px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.marshal-ability-btn {
+  flex: 1;
+  padding: 5px 6px;
+  background: rgba(26,58,110,.18);
+  border: 1px solid rgba(138,180,224,.16);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif;
+  font-size: .54rem; letter-spacing: .04em;
+  color: #8ab4e0; cursor: pointer;
+  transition: var(--trans);
+  text-align: center;
+  min-width: 0;
+}
+.marshal-ability-btn:hover {
+  background: rgba(26,58,110,.32);
+  border-color: rgba(138,180,224,.3);
+}
+.marshal-ability-btn:disabled {
+  opacity: .3; cursor: not-allowed;
+}
+.marshal-ability-btn.used {
+  background: rgba(40,40,40,.3);
+  border-color: rgba(100,100,100,.2);
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* Battle sides */
+.battle-vs {
+  display: flex; justify-content: space-between;
+  align-items: center; margin: 12px 0;
+}
+
+.bside { text-align: center; }
+
+.bside-label {
+  font-size: .6rem; letter-spacing: .14em;
+  opacity: .6; margin-bottom: 3px;
+  font-family: 'Cinzel', serif;
+}
+
+.bside-power {
+  font-size: 1.6rem;
+  font-weight: 700; font-family: 'Cinzel', serif;
+}
+
+.bblue { color: #60a5fa; }
+.bred  { color: #f87171; }
+.bvs   { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--fog); }
+
+/* Battle animation bar */
+.battle-anim-wrap {
+  height: 8px;
+  background: rgba(255,255,255,.07);
+  border-radius: 4px; overflow: hidden;
+  margin: 8px 0; position: relative;
+}
+
+.battle-anim-fill {
+  height: 100%; width: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #1a3a6e, #e9c176, #7b1f1f);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.battle-anim-fill.running {
+  animation: battle-sweep 1.2s ease-in-out forwards;
+}
+
+@keyframes battle-sweep {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.bresult {
+  min-height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IM Fell English', serif;
+  font-size: .95rem; margin: 8px 0; font-style: italic;
+}
+
+.bgood    { color: var(--success); }
+.bbad     { color: var(--danger); }
+.bneutral { color: var(--fog); }
+
+/* Loot display */
+.loot-result {
+  background: linear-gradient(135deg, rgba(160,80,160,.12), rgba(80,40,120,.08));
+  border: 1px solid rgba(192,128,192,.22);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: .86rem;
+  color: #d0a0d0;
+  display: none;
+}
+
+.loot-result.show { display: block; }
+
+/* ════════════════════════════════════
+   WIN MODAL
+════════════════════════════════════ */
+#win-modal { display: none; }
+
+/* ════════════════════════════════════
+   STORY MODAL
+════════════════════════════════════ */
+#story-modal { display: none; z-index: 450; }
+
+.story-inner {
+  max-width: 620px; width: 94%;
+  text-align: left; position: relative;
+  background: linear-gradient(155deg,#1f0d06 0%,#130805 55%,#1a0b07 100%);
+  border: 1px solid rgba(233,193,118,.3);
+  box-shadow:
+    0 0 80px rgba(233,193,118,.05),
+    0 0 0 4px rgba(233,193,118,.04),
+    0 40px 80px rgba(0,0,0,.88);
+  padding: clamp(20px,2.8vw,34px);
+  max-height: 88vh; overflow-y: auto;
+}
+
+.story-inner::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,transparent 0%,var(--gold) 30%,var(--gold2) 50%,var(--gold) 70%,transparent 100%);
+}
+
+.story-ornament {
+  font-size: 2.2rem;
+  text-align: center; display: block;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 14px rgba(233,193,118,.38));
+}
+
+.story-source {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem; letter-spacing: .25em;
+  color: var(--parch2);
+  text-transform: uppercase; text-align: center;
+  margin-bottom: 10px; opacity: .65;
+}
+
+.story-divider {
+  height: 1px; margin: 0 0 14px;
+  background: linear-gradient(90deg,transparent,rgba(233,193,118,.2),transparent);
+}
+
+.story-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.1rem,1.4vw,1.4rem);
+  font-weight: 900;
+  color: var(--gold); letter-spacing: .06em;
+  margin-bottom: 12px; text-align: center;
+  text-shadow: 0 0 28px rgba(233,193,118,.22);
+}
+
+.story-body {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.95rem,1.08vw,1.08rem);
+  color: var(--parch); line-height: 1.82;
+  margin: 0 0 18px; font-style: italic;
+  border-left: 2px solid rgba(233,193,118,.1);
+  padding-left: 14px;
+}
+
+.story-body em {
+  color: var(--gold2);
+  font-style: normal;
+  display: block;
+  margin-top: 14px;
+  font-size: 1.05em;
+}
+
+.story-choices {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 12px;
+}
+
+.story-choice {
+  width: 100%; text-align: left;
+  padding: 10px 13px;
+  background: rgba(233,193,118,.03);
+  border: 1px solid rgba(233,193,118,.14);
+  border-radius: var(--radius);
+  cursor: pointer; transition: var(--trans);
+  font-family: 'Crimson Text', serif;
+}
+
+.story-choice:hover {
+  background: rgba(233,193,118,.08);
+  border-color: rgba(233,193,118,.35);
+  transform: translateX(3px);
+}
+
+.sc-label {
+  font-family: 'Cinzel', serif;
+  font-size: .82rem; color: var(--gold2);
+  margin-bottom: 3px; letter-spacing: .04em;
+}
+
+.sc-sub { font-size: .82rem; color: var(--fog); font-style: italic; }
+
+.story-consequence {
+  background: linear-gradient(135deg,rgba(233,193,118,.06),rgba(233,193,118,.02));
+  border: 1px solid rgba(233,193,118,.18);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 15px;
+  font-family: 'IM Fell English', serif;
+  font-size: 1rem; color: var(--gold2);
+  font-style: italic; line-height: 1.72;
+  margin-bottom: 14px; display: none;
+}
+
+.story-continue {
+  width: 100%; padding: 10px;
+  background: linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
+  border: 1px solid rgba(233,193,118,.26);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif; font-size: .8rem;
+  letter-spacing: .12em; color: var(--gold2);
+  cursor: pointer; transition: var(--trans);
+  text-transform: uppercase; display: none;
+}
+
+.story-continue:hover {
+  background: linear-gradient(135deg,var(--imperial2),var(--imperial));
+  transform: translateY(-1px);
+}
+
+/* ── CONSEQUENCE TYPES ── */
+.consequence-good {
+  border-left-color: var(--success) !important;
+  color: var(--success) !important;
+}
+.consequence-bad {
+  border-left-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+/* ════════════════════════════════════
+   CONQUEST RESULT MODAL
+════════════════════════════════════ */
+#conquest-modal { z-index: 460; }
+
+.conquest-inner {
+  max-width: 540px; width: 94%;
+  text-align: center; position: relative;
+  background: linear-gradient(155deg,#1a0d06 0%,#0e0604 55%,#160a06 100%);
+  border: 1px solid rgba(233,193,118,.32);
+  box-shadow:
+    0 0 100px rgba(233,193,118,.08),
+    0 0 0 4px rgba(233,193,118,.04),
+    0 50px 90px rgba(0,0,0,.9);
+  padding: clamp(20px,2.8vw,34px);
+  max-height: 90vh; overflow-y: auto;
+}
+
+.conquest-seal {
+  font-size: 2.8rem;
+  text-align: center; display: block;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 18px rgba(233,193,118,.4));
+  animation: cq-seal-glow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes cq-seal-glow {
+  from { filter: drop-shadow(0 0 14px rgba(233,193,118,.3)); }
+  to   { filter: drop-shadow(0 0 24px rgba(233,193,118,.55)); }
+}
+
+.conquest-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem,1.3vw,1.3rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .15em;
+  margin-bottom: 14px;
+  text-shadow: 0 0 30px rgba(233,193,118,.25);
+  animation: cq-fade-in .6s ease both;
+}
+
+.conquest-body {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.84rem,.94vw,.94rem);
+  color: var(--parch);
+  line-height: 1.78;
+  font-style: italic;
+  text-align: left;
+  border-left: 2px solid rgba(233,193,118,.12);
+  padding-left: 14px;
+  margin: 0 0 14px;
+  animation: cq-fade-in .6s ease .15s both;
+}
+
+.conquest-body em { color: var(--gold2); font-style: normal; }
+
+.conquest-sensory {
+  font-family: 'IM Fell English', serif;
+  font-size: .76rem;
+  color: var(--parch2);
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 14px;
+  opacity: .7;
+  animation: cq-fade-in .6s ease .3s both;
+}
+
+.conquest-resources {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  animation: cq-fade-in .5s ease .45s both;
+}
+
+.cq-res-chip {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 10px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(233,193,118,.14);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif;
+  font-size: .6rem;
+  letter-spacing: .04em;
+}
+
+.cq-res-chip.positive { color: var(--success); border-color: rgba(110,231,183,.18); }
+.cq-res-chip.negative { color: var(--danger);  border-color: rgba(248,113,113,.18); }
+
+.conquest-loot {
+  background: linear-gradient(135deg, rgba(160,80,160,.1), rgba(80,40,120,.06));
+  border: 1px solid rgba(192,128,192,.2);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: .84rem;
+  color: #d0a0d0;
+  display: none;
+  animation: cq-fade-in .5s ease .55s both;
+}
+
+.conquest-loot.show { display: block; }
+
+.conquest-marshal {
+  background: rgba(233,193,118,.03);
+  border: 1px solid rgba(233,193,118,.12);
+  border-left: 3px solid rgba(233,193,118,.25);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 12px;
+  margin: 10px 0;
+  text-align: left;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: .82rem;
+  color: var(--parch);
+  line-height: 1.6;
+  animation: cq-fade-in .5s ease .6s both;
+}
+
+.conquest-marshal .cq-marshal-name {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem;
+  font-style: normal;
+  color: var(--gold);
+  letter-spacing: .1em;
+  margin-bottom: 4px;
+}
+
+@keyframes cq-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ════════════════════════════════════
+   DEFEAT MODAL
+════════════════════════════════════ */
+#defeat-modal { z-index: 460; }
+
+.defeat-inner {
+  max-width: 480px; width: 92%;
+  text-align: center;
+  background: linear-gradient(155deg,#1a0808 0%,#0e0505 55%,#160808 100%);
+  border: 1px solid rgba(248,113,113,.2);
+  box-shadow: 0 0 80px rgba(248,113,113,.06), 0 40px 70px rgba(0,0,0,.85);
+}
+
+.defeat-seal { color: #c06060; filter: drop-shadow(0 0 12px rgba(248,113,113,.3)) !important; }
+.defeat-title { color: var(--danger) !important; }
+
+.defeat-body {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.84rem,.92vw,.92rem);
+  color: var(--parch);
+  line-height: 1.72;
+  font-style: italic;
+  text-align: left;
+  border-left: 2px solid rgba(248,113,113,.15);
+  padding-left: 14px;
+  margin: 0 0 14px;
+}
+
+.defeat-resources {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.defeat-marshal {
+  background: rgba(248,113,113,.04);
+  border: 1px solid rgba(248,113,113,.12);
+  border-left: 3px solid rgba(248,113,113,.25);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 8px 12px;
+  margin: 8px 0;
+  text-align: left;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: .8rem;
+  color: #e07070;
+  line-height: 1.5;
+  display: none;
+}
+
+.defeat-marshal.show { display: block; }
+
+/* ════════════════════════════════════
+   CHAPTER TRANSITION CINEMATIC
+════════════════════════════════════ */
+.chapter-transition {
+  position: fixed; inset: 0; z-index: 500;
+  background: #050201;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .8s ease;
+}
+
+.chapter-transition.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chapter-transition-inner {
+  text-align: center;
+  max-width: 500px;
+  padding: 0 20px;
+}
+
+.chapter-numeral {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem,5vw,4.5rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .3em;
+  opacity: 0;
+  text-shadow: 0 0 40px rgba(233,193,118,.35);
+}
+
+.chapter-transition.active .chapter-numeral {
+  animation: ch-numeral 1.2s ease .3s both;
+}
+
+@keyframes ch-numeral {
+  from { opacity: 0; transform: scale(.85); }
+  60%  { opacity: 1; transform: scale(1); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.chapter-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.7rem,1vw,1rem);
+  font-weight: 900;
+  color: var(--gold2);
+  letter-spacing: .25em;
+  margin-top: 6px;
+  opacity: 0;
+}
+
+.chapter-transition.active .chapter-name {
+  animation: cq-fade-in .8s ease .8s both;
+}
+
+.chapter-epigraph {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.78rem,.9vw,.9rem);
+  color: var(--parch2);
+  font-style: italic;
+  margin-top: 18px;
+  line-height: 1.7;
+  opacity: 0;
+}
+
+.chapter-transition.active .chapter-epigraph {
+  animation: cq-fade-in .8s ease 1.3s both;
+}
+
+/* ════════════════════════════════════
+   ENHANCED WIN SCREEN
+════════════════════════════════════ */
+.win-inner {
+  max-width: 620px; width: 94%;
+  text-align: center;
+  background: linear-gradient(160deg,#1a0d06 0%,#0c0604 60%,#140a06 100%);
+  border: 1px solid rgba(233,193,118,.35);
+  box-shadow:
+    0 0 120px rgba(233,193,118,.1),
+    0 0 0 6px rgba(233,193,118,.04),
+    0 50px 100px rgba(0,0,0,.92);
+  padding: clamp(22px,3vw,38px);
+  max-height: 92vh; overflow-y: auto;
+}
+
+.win-crown {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 24px rgba(233,193,118,.45));
+  animation: cq-seal-glow 3s ease-in-out infinite alternate;
+}
+
+.win-title {
+  font-size: clamp(1.05rem,1.4vw,1.4rem) !important;
+  letter-spacing: .14em !important;
+}
+
+.win-epigraph {
+  font-family: 'IM Fell English', serif;
+  font-size: .82rem;
+  color: var(--parch2);
+  font-style: italic;
+  margin: 6px 0 14px;
+  opacity: .65;
+}
+
+.win-narrative {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.84rem,.94vw,.94rem);
+  color: var(--parch);
+  line-height: 1.82;
+  font-style: italic;
+  text-align: left;
+  margin: 14px 0;
+  padding: 0 4px;
+}
+
+.win-narrative em { color: var(--gold2); font-style: normal; }
+
+.win-marshals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.win-marshal-beat {
+  background: rgba(233,193,118,.03);
+  border: 1px solid rgba(233,193,118,.1);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.win-marshal-beat .wmb-avatar {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.win-marshal-beat .wmb-content {
+  flex: 1;
+}
+
+.win-marshal-beat .wmb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.win-marshal-beat .wmb-name {
+  font-family: 'Cinzel', serif;
+  font-size: .66rem;
+  color: var(--gold2);
+  letter-spacing: .06em;
+}
+
+.win-marshal-beat .wmb-status {
+  font-size: .48rem;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: 'Cinzel', serif;
+}
+
+.win-marshal-beat .wmb-prose {
+  font-family: 'IM Fell English', serif;
+  font-size: .82rem;
+  color: var(--parch);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.win-stats-bar {
+  font-family: 'Cinzel', serif;
+  font-size: .56rem;
+  color: var(--fog);
+  letter-spacing: .08em;
+  text-align: center;
+  margin: 10px 0;
+  opacity: .6;
+}
+
+.win-final-line {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(.92rem,1.1vw,1.1rem);
+  color: var(--gold);
+  font-style: italic;
+  text-align: center;
+  margin: 16px 0;
+  line-height: 1.7;
+  text-shadow: 0 0 20px rgba(233,193,118,.2);
+}
+
+.win-btn {
+  margin-top: 10px;
+}

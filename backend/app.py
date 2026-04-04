@@ -8,29 +8,27 @@ from flask_cors import CORS
 from game_engine import GameEngine
 
 app  = Flask(__name__, template_folder="templates")
-CORS(app)   # Allow the frontend (same or different origin) to call the API
+CORS(app)
 
 game = GameEngine()
 
 
-# ── Serve the game UI ────────────────────────────────────────────────────────
+# ── UI ───────────────────────────────────────────────────────────────────────
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# ── Graph / map data ─────────────────────────────────────────────────────────
+# ── Map data ─────────────────────────────────────────────────────────────────
 
 @app.route("/countries")
 def countries():
-    """All territory names in the graph."""
     return jsonify(game.map.get_countries())
 
 
 @app.route("/graph")
 def graph():
-    """Full adjacency list + metadata for every territory."""
     data = {}
     for city in game.map.get_countries():
         data[city] = {
@@ -41,37 +39,27 @@ def graph():
     return jsonify(data)
 
 
-# ── Algorithm endpoints ───────────────────────────────────────────────────────
+# ── Algorithms ───────────────────────────────────────────────────────────────
 
 @app.route("/explore/bfs")
 def explore_bfs():
-    """BFS traversal from Paris — returns visit order, levels, parents."""
     return jsonify(game.explore_map_bfs())
 
 
 @app.route("/explore/dfs")
 def explore_dfs():
-    """DFS traversal from Paris — returns visit order and parent tree."""
-    return jsonify(game.explore_map_dfs())
-
-
-@app.route("/explore")
-def explore():
-    """Legacy endpoint — defaults to DFS (backward compat)."""
     return jsonify(game.explore_map_dfs())
 
 
 @app.route("/routes")
 def routes():
-    """Dijkstra from Paris — cheapest path + distance to every city."""
     return jsonify(game.best_routes())
 
 
 @app.route("/routes/<target>")
 def route_to(target):
-    """Dijkstra shortest path specifically to <target>."""
     result = game.best_routes()
-    city   = target.title()          # normalise capitalisation
+    city   = target.title()
     if city not in result["distances"]:
         return jsonify({"error": f"Unknown territory: {city}"}), 404
     return jsonify({
@@ -83,7 +71,6 @@ def route_to(target):
 
 @app.route("/reachable")
 def reachable():
-    """BFS adjacency — territories adjacent to player's empire (legal invasion targets)."""
     return jsonify({
         "controlled": game.get_controlled_territories(),
         "reachable":  game.reachable_targets(),
@@ -94,7 +81,6 @@ def reachable():
 
 @app.route("/choices")
 def choices():
-    """Strategic choices available to the player right now."""
     return jsonify(game.choices())
 
 
@@ -102,7 +88,6 @@ def choices():
 
 @app.route("/state")
 def state():
-    """Full game state snapshot: resources + controlled territories."""
     return jsonify({
         "resources":  game.get_resources(),
         "controlled": game.get_controlled_territories(),
@@ -112,13 +97,11 @@ def state():
 
 @app.route("/resources")
 def resources():
-    """Current player resources (army, gold, morale, turn)."""
     return jsonify(game.get_resources())
 
 
 @app.route("/controlled")
 def controlled():
-    """List of territories the player controls."""
     return jsonify(game.get_controlled_territories())
 
 
@@ -126,24 +109,33 @@ def controlled():
 
 @app.route("/invade/<country>")
 def invade(country):
-    """
-    Attempt to invade <country>.
-    Returns battle result, updated resources, and controlled list.
-    """
-    result = game.invade(country.title())
-    return jsonify(result)
+    return jsonify(game.invade(country.title()))
 
 
 @app.route("/endturn", methods=["POST", "GET"])
 def end_turn():
-    """Advance turn: collect taxes, apply reinforcements."""
     return jsonify(game.end_turn())
 
 
 @app.route("/reset", methods=["POST", "GET"])
 def reset():
-    """Reset the game to initial state."""
+    game._reset_state()
     return jsonify(game.reset())
+
+
+# ── Sync — frontend pushes authoritative state to backend ────────────────────
+# Called after every state-changing action so /state always reflects reality.
+# Body: { army, gold, morale, turn, controlled: [...] }
+
+@app.route("/sync", methods=["POST"])
+def sync():
+    data       = request.get_json(force=True, silent=True) or {}
+    army       = data.get("army",       0)
+    gold       = data.get("gold",       0)
+    morale     = data.get("morale",     85)
+    turn       = data.get("turn",       1)
+    controlled = data.get("controlled", ["Paris"])
+    return jsonify(game.sync_state(army, gold, morale, turn, controlled))
 
 
 # ─────────────────────────────────────────────────────────────────────────────

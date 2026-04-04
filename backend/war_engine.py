@@ -8,17 +8,10 @@ import random
 
 class WarEngine:
 
-    def simulate_battle(self, attacker_strength: int,
-                        defender_strength: int) -> dict:
+    def simulate_battle(self, attacker_strength: int, defender_strength: int) -> dict:
         """
-        Roll combat dice and return a detailed battle report.
-
-        Both sides add a random bonus (0-5) to simulate fog-of-war.
-        Returns a dict with keys:
-          - result        : "Victory" | "Defeat"
-          - attack_power  : final attacker roll
-          - defense_power : final defender roll
-          - margin        : difference (positive = attacker wins)
+        Roll combat dice — attacker wins if roll beats defender.
+        Returns result, powers, and margin.
         """
         atk_roll = attacker_strength + random.randint(0, 5)
         def_roll = defender_strength  + random.randint(0, 5)
