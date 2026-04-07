@@ -423,3 +423,68 @@ function resetGameData() {
   abortFlag  = true;
   battleState = { commitFraction: 1.0, marshalAbility: null };
 }
+
+
+// ── SAVE / LOAD STATE SERIALIZATION ────────────────────────────
+
+/**
+ * Serialize the entire game state into a single JSON-safe object.
+ * Used by Auth.saveGame() for auto-save.
+ */
+function getFullState() {
+  return {
+    version: 1,
+    timestamp: new Date().toISOString(),
+    resources: { ...res },
+    territories: T.map(t => ({
+      id:       t.id,
+      owner:    t.owner,
+      status:   t.status,
+      revealed: t.revealed,
+      units:    t.units,
+    })),
+    story: Story.getState(),
+    algo: algo,
+    selectedId: selId,
+  };
+}
+
+/**
+ * Restore the full game state from a save blob.
+ * Used by Auth.loadSavedGame() on continue.
+ */
+function restoreFullState(data) {
+  if (!data || data.version !== 1) return;
+
+  // Restore resources
+  if (data.resources) {
+    res.army   = data.resources.army   ?? 30000;
+    res.gold   = data.resources.gold   ?? 600;
+    res.morale = data.resources.morale ?? 85;
+    res.turn   = data.resources.turn   ?? 1;
+  }
+
+  // Restore territory states
+  if (data.territories) {
+    data.territories.forEach(saved => {
+      const t = T[saved.id];
+      if (!t) return;
+      t.owner    = saved.owner    ?? t.owner;
+      t.status   = saved.status   ?? t.status;
+      t.revealed = saved.revealed ?? t.revealed;
+      t.units    = saved.units    ?? t.units;
+    });
+  }
+
+  // Restore story state (marshals, fired events, chapter, storyPath)
+  if (data.story) {
+    Story.restoreState(data.story);
+  }
+
+  // Restore algorithm selection
+  if (data.algo) {
+    algo = data.algo;
+  }
+
+  selId = data.selectedId ?? null;
+}

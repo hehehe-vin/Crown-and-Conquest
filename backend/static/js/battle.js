@@ -302,7 +302,7 @@ function handleVictory(t, armyCostPaid, _lossMultDef) {
   // Store data for conquest result screen
   lastConquestData = { territory: t, lootMsg, loot, armyCostPaid, armyRefund };
 
-  syncBackend();
+  autoSave();
 
   // Close battle modal → open conquest result screen
   setTimeout(() => {
@@ -338,7 +338,7 @@ function handleDefeat(t, armyCostPaid, lossMultOnDefeat) {
     log(`Defeat at ${t.name}. Army: ${res.army.toLocaleString()}, Morale: ${res.morale}%`, 'defeat');
   }
 
-  syncBackend();
+  autoSave();
 
   // Close battle modal → show defeat screen
   setTimeout(() => {
@@ -494,7 +494,7 @@ function endTurn() {
   updateRes();
   if (selId !== null) selectT(selId);
 
-  syncBackend();
+  autoSave();
   setTimeout(() => Story.check(), 500);
 }
 

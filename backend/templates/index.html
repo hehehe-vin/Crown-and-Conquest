@@ -27,8 +27,52 @@
   <div class="tip-row"  id="tip-row2"></div>
 </div>
 
+<!-- ════ AUTH MODAL (LOGIN / SIGNUP) ════ -->
+<div class="modal-backdrop" id="auth-modal" style="display:none;">
+  <div class="modal auth-modal">
+    <div class="mcrest">⚜</div>
+    <div class="mtitle">Crown &amp; Conquest</div>
+    <div class="msub" style="margin-bottom:10px;">
+      Sign in to save your campaign progress.
+    </div>
+
+    <!-- Tab Toggle -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login" onclick="Auth.showTab('login')">Sign In</button>
+      <button class="auth-tab" id="auth-tab-signup" onclick="Auth.showTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Error Message -->
+    <div class="auth-error" id="auth-error"></div>
+
+    <!-- Login Form -->
+    <div id="auth-login-form">
+      <input type="text" class="auth-input" id="auth-login-user" placeholder="Username" autocomplete="username" />
+      <input type="password" class="auth-input" id="auth-login-pass" placeholder="Password" autocomplete="current-password" />
+      <button class="mbtn auth-btn" id="auth-login-btn" onclick="Auth.login()">Sign In ▶</button>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="auth-signup-form" style="display:none;">
+      <input type="text" class="auth-input" id="auth-signup-user" placeholder="Choose a username" autocomplete="username" />
+      <input type="password" class="auth-input" id="auth-signup-pass" placeholder="Password (4+ characters)" autocomplete="new-password" />
+      <input type="password" class="auth-input" id="auth-signup-confirm" placeholder="Confirm password" autocomplete="new-password" />
+      <button class="mbtn auth-btn" id="auth-signup-btn" onclick="Auth.signup()">Create Account ▶</button>
+    </div>
+
+    <!-- Guest Mode -->
+    <div class="auth-divider">
+      <span>or</span>
+    </div>
+    <button class="mbtn sec auth-guest-btn" onclick="Auth.enterGuest()">
+      Play as Guest
+    </button>
+    <div class="auth-guest-note">Progress will not be saved</div>
+  </div>
+</div>
+
 <!-- ════ INTRO MODAL ════ -->
-<div class="modal-backdrop" id="intro-modal">
+<div class="modal-backdrop" id="intro-modal" style="display:none;">
   <div class="modal">
     <div class="mcrest">⚜</div>
     <div class="mtitle">Crown &amp; Conquest</div>
@@ -49,7 +93,9 @@
         <div style="font-family:'Cinzel',serif;color:var(--gold);margin-bottom:2px;">Algorithms</div>4 Intel Commands
       </div>
     </div>
-    <button class="mbtn" onclick="startGame()">Begin Campaign</button>
+    <div id="intro-btn-area">
+      <button class="mbtn" onclick="startGame()">Begin Campaign</button>
+    </div>
   </div>
 </div>
 
@@ -228,6 +274,14 @@
       <span class="label-text">Turn</span>
       <span class="rval" id="r-turn">1</span>
     </div>
+    <!-- User display & logout -->
+    <div class="rchip user-chip" id="user-chip" style="display:none;">
+      <span class="material-symbols-outlined">person</span>
+      <span class="rval" id="user-display" style="display:none;"></span>
+      <button class="logout-link" id="logout-btn" style="display:none;" onclick="Auth.logout()" title="Sign Out">
+        <span class="material-symbols-outlined" style="font-size:.9rem;">logout</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -236,6 +290,10 @@
 
   <!-- ── LEFT SIDEBAR ── -->
   <div id="sidebar">
+    <button class="panel-collapse-btn sidebar-collapse" id="sidebar-collapse-btn"
+            onclick="togglePanel('sidebar')" title="Collapse sidebar">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
 
     <!-- Intel Commands (algorithm selector) — in-world names -->
     <div class="sb-sec">
@@ -295,6 +353,15 @@
     <button class="act-btn reset"              onclick="resetGame()">↺ Reset Campaign</button>
   </div>
 
+  <!-- Resize handle: sidebar ↔ map -->
+  <div class="resize-handle resize-handle-left" id="resize-left" title="Drag to resize"></div>
+
+  <!-- Collapsed sidebar toggle -->
+  <button class="panel-expand-btn expand-left" id="sidebar-expand-btn"
+          onclick="togglePanel('sidebar')" title="Expand sidebar" style="display:none;">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+
   <!-- ── MAP AREA ── -->
   <div id="map-area">
     <!-- Napoleonic parchment map (served from /static/map.png by Flask) -->
@@ -323,8 +390,21 @@
     <div id="chapter-hud">⚜ CHAPTER I — THE EAGLE AWAKENS</div>
   </div>
 
+  <!-- Resize handle: map ↔ log -->
+  <div class="resize-handle resize-handle-right" id="resize-right" title="Drag to resize"></div>
+
+  <!-- Collapsed log toggle -->
+  <button class="panel-expand-btn expand-right" id="log-expand-btn"
+          onclick="togglePanel('log')" title="Expand log" style="display:none;">
+    <span class="material-symbols-outlined">article</span>
+  </button>
+
   <!-- ── RIGHT LOG PANEL ── -->
   <div id="log-area">
+    <button class="panel-collapse-btn log-collapse" id="log-collapse-btn"
+            onclick="togglePanel('log')" title="Collapse log">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
     <div id="log-hdr">⚜ BATTLE CHRONICLE</div>
     <div id="log-body"></div>
     <div id="algo-steps">
@@ -358,6 +438,7 @@
 <script src="/static/js/algorithms.js"></script>
 <script src="/static/js/battle.js"></script>
 <script src="/static/js/story.js"></script>
+<script src="/static/js/auth.js"></script>
 <script src="/static/js/game.js"></script>
 
 </body>

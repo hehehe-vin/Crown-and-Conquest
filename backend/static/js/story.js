@@ -642,6 +642,57 @@ const Story = (() => {
   function getPath() { return storyPath; }
   function getCurrentChapter() { return getChapter(); }
 
+  // ── Save/Load State ──────────────────────────────────────────
+  function getState() {
+    const marshalState = {};
+    for (const [key, m] of Object.entries(MARSHALS)) {
+      marshalState[key] = {
+        loyalty: m.loyalty,
+        alive:   m.alive,
+        glory:   m.glory,
+      };
+    }
+    return {
+      fired:          Array.from(fired),
+      storyPath:      [...storyPath],
+      currentChapter: currentChapter,
+      marshals:       marshalState,
+    };
+  }
+
+  function restoreState(data) {
+    if (!data) return;
+
+    // Restore fired events
+    if (data.fired) {
+      fired = new Set(data.fired);
+    }
+
+    // Restore story path
+    if (data.storyPath) {
+      storyPath = [...data.storyPath];
+    }
+
+    // Restore chapter
+    if (data.currentChapter) {
+      currentChapter = data.currentChapter;
+    }
+
+    // Restore marshal states
+    if (data.marshals) {
+      for (const [key, saved] of Object.entries(data.marshals)) {
+        if (MARSHALS[key]) {
+          MARSHALS[key].loyalty = saved.loyalty ?? MARSHALS[key].loyalty;
+          MARSHALS[key].alive   = saved.alive   ?? true;
+          MARSHALS[key].glory   = saved.glory   ?? 0;
+        }
+      }
+    }
+
+    updateChapter();
+    updateMarshals();
+  }
+
   return {
     check,
     close,
@@ -657,6 +708,8 @@ const Story = (() => {
     marshalLoyaltyHit,
     boostRandomMarshal,
     marshalStatus,
+    getState,
+    restoreState,
   };
 
 })();

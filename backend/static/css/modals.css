@@ -3,6 +3,149 @@
    All modal, story, and overlay styles
 ══════════════════════════════════════════════ */
 
+/* ════════════════════════════════════
+   AUTH MODAL (LOGIN / SIGNUP)
+════════════════════════════════════ */
+.auth-modal {
+  max-width: 420px; width: 92%;
+  padding: clamp(22px,3vw,34px);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin: 14px 0 16px;
+  border: 1px solid rgba(233,193,118,.18);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px 0;
+  background: rgba(0,0,0,.3);
+  border: none;
+  font-family: 'Cinzel', serif;
+  font-size: .78rem;
+  letter-spacing: .1em;
+  color: var(--fog);
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.auth-tab.active {
+  background: rgba(233,193,118,.1);
+  color: var(--gold);
+}
+
+.auth-tab:hover:not(.active) {
+  background: rgba(233,193,118,.05);
+  color: var(--parch);
+}
+
+.auth-input {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: rgba(0,0,0,.4);
+  border: 1px solid rgba(233,193,118,.15);
+  border-radius: var(--radius);
+  font-family: 'IM Fell English', serif;
+  font-size: .95rem;
+  color: var(--parch);
+  outline: none;
+  transition: border-color .2s ease;
+}
+
+.auth-input::placeholder {
+  color: rgba(158,144,128,.5);
+  font-style: italic;
+}
+
+.auth-input:focus {
+  border-color: rgba(233,193,118,.4);
+  box-shadow: 0 0 12px rgba(233,193,118,.06);
+}
+
+.auth-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 0;
+  font-size: .88rem;
+}
+
+.auth-error {
+  font-family: 'IM Fell English', serif;
+  font-size: .88rem;
+  color: var(--danger);
+  text-align: center;
+  min-height: 1.4em;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+
+@keyframes auth-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: var(--fog);
+  font-family: 'IM Fell English', serif;
+  font-size: .82rem;
+  font-style: italic;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(233,193,118,.12);
+}
+
+.auth-guest-btn {
+  width: 100%;
+  padding: 10px 0;
+  font-size: .82rem;
+}
+
+.auth-guest-note {
+  font-family: 'IM Fell English', serif;
+  font-size: .72rem;
+  color: var(--fog);
+  text-align: center;
+  margin-top: 6px;
+  opacity: .55;
+  font-style: italic;
+}
+
+/* Topbar user display */
+.user-chip {
+  gap: 4px !important;
+}
+
+.logout-link {
+  background: none;
+  border: none;
+  color: var(--fog);
+  cursor: pointer;
+  padding: 2px;
+  opacity: .6;
+  transition: all .2s ease;
+}
+
+.logout-link:hover {
+  color: var(--danger);
+  opacity: 1;
+}
+
 /* ── SHARED BACKDROP ── */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 400;

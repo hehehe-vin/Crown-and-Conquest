@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════
    game.js  ·  Crown & Conquest — DAA-IV-T241
    Entry point: backend API bridge, game init,
-   sidebar intel command setup.
+   sidebar intel command setup, auth integration.
 ══════════════════════════════════════════════════════════════ */
 
 // ── BACKEND API BRIDGE ─────────────────────────────────────────
@@ -54,6 +54,15 @@ function syncBackend() {
   });
 }
 
+/**
+ * Auto-save after state-changing actions (conquest, end turn).
+ * Called alongside syncBackend. Fire-and-forget.
+ */
+function autoSave() {
+  syncBackend();
+  Auth.saveGame();
+}
+
 // ── SIDEBAR — INTEL COMMAND BUTTONS ────────────────────────────
 // Render algorithm selector buttons using ALGO_META in-world labels
 function buildIntelButtons() {
@@ -103,11 +112,139 @@ function startGame() {
   setTimeout(() => Story.check(), 2000);
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  COLLAPSIBLE PANELS + DRAG-TO-RESIZE
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Toggle sidebar or log panel collapsed/expanded.
+ * @param {'sidebar'|'log'} panel
+ */
+function togglePanel(panel) {
+  if (panel === 'sidebar') {
+    const sidebar   = document.getElementById('sidebar');
+    const expandBtn = document.getElementById('sidebar-expand-btn');
+    const resizeH   = document.getElementById('resize-left');
+    const collapsed = sidebar.classList.toggle('collapsed');
+
+    expandBtn.style.display = collapsed ? 'flex' : 'none';
+    resizeH.classList.toggle('hidden', collapsed);
+    localStorage.setItem('cc_sidebar_collapsed', collapsed ? '1' : '0');
+  } else {
+    const logArea   = document.getElementById('log-area');
+    const expandBtn = document.getElementById('log-expand-btn');
+    const resizeH   = document.getElementById('resize-right');
+    const collapsed = logArea.classList.toggle('collapsed');
+
+    expandBtn.style.display = collapsed ? 'flex' : 'none';
+    resizeH.classList.toggle('hidden', collapsed);
+    localStorage.setItem('cc_log_collapsed', collapsed ? '1' : '0');
+  }
+}
+
+/**
+ * Initialize drag-to-resize handles for sidebar and log panel.
+ */
+function initResizeHandles() {
+  const sidebar  = document.getElementById('sidebar');
+  const logArea  = document.getElementById('log-area');
+  const layout   = document.getElementById('layout');
+
+  // ── Left resize handle (sidebar ↔ map) ──
+  initDragResize('resize-left', (dx) => {
+    const currentW = sidebar.getBoundingClientRect().width;
+    const newW = Math.max(140, Math.min(400, currentW + dx));
+    sidebar.style.width = newW + 'px';
+    localStorage.setItem('cc_sidebar_w', newW);
+  });
+
+  // ── Right resize handle (map ↔ log) ──
+  initDragResize('resize-right', (dx) => {
+    const currentW = logArea.getBoundingClientRect().width;
+    // Dragging right handle to the left = positive dx means log shrinks
+    const newW = Math.max(120, Math.min(360, currentW - dx));
+    logArea.style.width = newW + 'px';
+    localStorage.setItem('cc_log_w', newW);
+  });
+
+  // Restore saved widths from localStorage
+  const savedSW = localStorage.getItem('cc_sidebar_w');
+  const savedLW = localStorage.getItem('cc_log_w');
+  if (savedSW) sidebar.style.width = savedSW + 'px';
+  if (savedLW) logArea.style.width  = savedLW + 'px';
+
+  // Restore collapsed states
+  if (localStorage.getItem('cc_sidebar_collapsed') === '1') togglePanel('sidebar');
+  if (localStorage.getItem('cc_log_collapsed') === '1')     togglePanel('log');
+}
+
+/**
+ * Generic drag-resize initializer.
+ * @param {string} handleId  - The resize handle element ID
+ * @param {(dx: number) => void} onDrag - Called with horizontal delta each mousemove
+ */
+function initDragResize(handleId, onDrag) {
+  const handle = document.getElementById(handleId);
+  if (!handle) return;
+
+  let startX = 0;
+
+  function onMouseDown(e) {
+    e.preventDefault();
+    startX = e.clientX;
+    handle.classList.add('dragging');
+    document.body.classList.add('resizing');
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+
+  function onMouseMove(e) {
+    const dx = e.clientX - startX;
+    startX = e.clientX;
+    onDrag(dx);
+  }
+
+  function onMouseUp() {
+    handle.classList.remove('dragging');
+    document.body.classList.remove('resizing');
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  handle.addEventListener('mousedown', onMouseDown);
+
+  // Touch support for tablets
+  handle.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startX = e.touches[0].clientX;
+    handle.classList.add('dragging');
+    document.body.classList.add('resizing');
+
+    function onTouchMove(e) {
+      const dx = e.touches[0].clientX - startX;
+      startX = e.touches[0].clientX;
+      onDrag(dx);
+    }
+
+    function onTouchEnd() {
+      handle.classList.remove('dragging');
+      document.body.classList.remove('resizing');
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+    }
+
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onTouchEnd);
+  }, { passive: false });
+}
+
+
 // ── DOMContentLoaded ───────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   buildIntelButtons();
   initComplexityAccordion();
   initBattleModal();
+  initResizeHandles();
 
   // Set complexity box to default algo (Dijkstra)
   const m = ALGO_META[algo];
@@ -118,4 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateRes();
   Story.updateMarshals();
   Story.updateChapter();
+
+  // Auth: check session → show login or intro
+  Auth.initKeyboard();
+  Auth.checkSession();
 });

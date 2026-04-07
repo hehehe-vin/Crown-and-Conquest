@@ -676,6 +676,121 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 /* ════════════════════════════════════════════
+   COLLAPSIBLE PANELS + RESIZE HANDLES
+════════════════════════════════════════════ */
+
+/* ── Panel collapse / expand buttons ── */
+.panel-collapse-btn {
+  position: absolute; top: 6px; z-index: 50;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(233,193,118,.08);
+  border: 1px solid rgba(233,193,118,.18);
+  border-radius: var(--radius);
+  color: var(--gold);
+  cursor: pointer;
+  transition: var(--trans);
+  padding: 0;
+  line-height: 1;
+}
+.panel-collapse-btn:hover {
+  background: rgba(233,193,118,.18);
+  border-color: rgba(233,193,118,.35);
+  transform: scale(1.1);
+}
+.panel-collapse-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.sidebar-collapse { right: 6px; }
+.log-collapse     { left: 6px; }
+
+/* Expand buttons — shown when panel is collapsed */
+.panel-expand-btn {
+  position: relative;
+  z-index: 50; flex-shrink: 0;
+  width: 28px; height: auto;
+  align-self: stretch;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(18,5,2,.92);
+  border: none;
+  border-left: 1px solid rgba(233,193,118,.1);
+  border-right: 1px solid rgba(233,193,118,.1);
+  color: var(--gold);
+  cursor: pointer;
+  transition: var(--trans);
+  padding: 0;
+  writing-mode: vertical-rl;
+}
+.panel-expand-btn:hover {
+  background: rgba(233,193,118,.1);
+  color: var(--gold2);
+}
+.panel-expand-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.expand-left  { border-right: 1px solid rgba(233,193,118,.14); border-left: none; }
+.expand-right { border-left: 1px solid rgba(233,193,118,.14); border-right: none; }
+
+/* ── Resize handles ── */
+.resize-handle {
+  width: 5px; flex-shrink: 0;
+  cursor: col-resize;
+  position: relative;
+  z-index: 45;
+  background: transparent;
+  transition: background .15s;
+}
+.resize-handle::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px; height: 36px;
+  border-radius: 3px;
+  background: rgba(233,193,118,.12);
+  transition: background .15s, height .15s, box-shadow .15s;
+}
+.resize-handle:hover::after,
+.resize-handle.dragging::after {
+  background: rgba(233,193,118,.4);
+  height: 56px;
+  box-shadow: 0 0 8px rgba(233,193,118,.2);
+}
+.resize-handle.dragging {
+  background: rgba(233,193,118,.06);
+}
+
+/* ── Collapsed panel states ── */
+#sidebar.collapsed,
+#log-area.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sidebar needs relative for collapse btn */
+#sidebar { position: relative; transition: width .28s ease, opacity .18s ease; }
+#log-area { position: relative; transition: width .28s ease, opacity .18s ease; }
+
+/* Hide resize handle when panel is collapsed */
+.resize-handle.hidden { display: none; }
+
+/* ── Body dragging state ── */
+body.resizing {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+body.resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/* ════════════════════════════════════════════
    RESPONSIVE — smaller screens
 ════════════════════════════════════════════ */
 @media (max-width: 900px) {
@@ -699,6 +814,7 @@ input[type=range]::-webkit-slider-thumb {
   }
 
   #sidebar, #log-area { display: none; }
+  .resize-handle, .panel-expand-btn, .panel-collapse-btn { display: none !important; }
 
   #mobile-bar {
     display: flex;
