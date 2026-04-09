@@ -159,10 +159,24 @@ body::after {
   box-shadow: 3px 0 24px rgba(0,0,0,.5);
 }
 
+/* Scrollable middle area — everything between the collapse btn and action buttons */
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* critical for flex overflow-scroll */
+}
+
 .sb-sec {
   padding: 9px 10px 7px;
   border-bottom: 1px solid rgba(233,193,118,.06);
+}
+
+/* Pinned bottom actions area */
+.sidebar-actions {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sec-lbl {
@@ -173,6 +187,41 @@ body::after {
   text-transform: uppercase;
   margin-bottom: 6px;
   opacity: .6;
+}
+
+/* ── Collapsible section toggle (reusable) ── */
+.sec-toggle {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  background: transparent; border: none;
+  padding: 0; cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.46rem,.54vw,.54rem);
+  letter-spacing: .24em;
+  color: var(--parch2);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  opacity: .6;
+  transition: color .18s, opacity .18s;
+}
+.sec-toggle:hover { color: var(--gold); opacity: .85; }
+.sec-toggle .sec-arrow {
+  font-size: .6rem;
+  transition: transform .22s ease;
+  color: var(--fog);
+}
+.sec-toggle.collapsed .sec-arrow { transform: rotate(-90deg); }
+
+.sec-body {
+  overflow: hidden;
+  max-height: 500px; /* generous default */
+  transition: max-height .3s ease, opacity .2s ease;
+  opacity: 1;
+}
+.sec-body.collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── INTEL COMMANDS (renamed algo buttons) ── */
@@ -251,7 +300,7 @@ body::after {
   max-height: 0;
   transition: max-height .28s ease;
 }
-.cx-body.open { max-height: 120px; }
+.cx-body.open { max-height: 160px; }
 
 .cx-box {
   background: rgba(0,0,0,.25);
@@ -267,9 +316,9 @@ body::after {
 /* ── TERRITORY INFO PANEL ── */
 #info-panel {
   padding: 8px 10px;
-  flex: 1;
   overflow-y: auto;
-  min-height: 50px;
+  min-height: 0;
+  border-bottom: 1px solid rgba(233,193,118,.06);
 }
 
 .tcard {
@@ -331,9 +380,7 @@ body::after {
   padding: 7px 10px 5px;
   border-top: 1px solid rgba(233,193,118,.06);
   border-bottom: 1px solid rgba(233,193,118,.06);
-  max-height: 155px;
   overflow-y: auto;
-  flex-shrink: 0;
 }
 
 .marshal-row {
@@ -411,7 +458,7 @@ body::after {
 input[type=range] {
   flex: 1; accent-color: var(--gold); height: 3px;
   background: rgba(233,193,118,.15); border-radius: 2px;
-  outline: none; -webkit-appearance: none;
+  outline: none; appearance: none; -webkit-appearance: none;
   cursor: pointer;
 }
 input[type=range]::-webkit-slider-thumb {
@@ -626,9 +673,12 @@ input[type=range]::-webkit-slider-thumb {
 #algo-steps {
   padding: 6px 9px;
   border-top: 1px solid rgba(233,193,118,.08);
-  max-height: 130px;
   overflow-y: auto;
   flex-shrink: 0;
+}
+#algo-steps .sec-body {
+  max-height: 130px;
+  overflow-y: auto;
 }
 
 .steplbl {
@@ -903,4 +953,28 @@ body.resizing * {
   .brand { font-size: 1.05rem; }
   .res-item .res-val { font-size: 1rem; }
   .act-btn { font-size: .72rem; }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE — SHORT VIEWPORTS (height)
+════════════════════════════════════ */
+@media (max-height: 750px) {
+  .sb-sec { padding: 6px 10px 5px; }
+  .act-btn { margin: 0 8px 5px; padding: 7px 6px; }
+  .speed-ctrl { padding: 4px 10px; }
+  #marshal-panel { padding: 5px 10px 3px; }
+  #info-panel { padding: 5px 10px; }
+  .intel-btn { padding: 4px 8px; margin-bottom: 2px; }
+  .sec-toggle { margin-bottom: 4px; }
+}
+
+@media (max-height: 600px) {
+  .act-btn { margin: 0 8px 4px; padding: 5px 6px; font-size: .56rem; }
+  .speed-ctrl { padding: 3px 8px; }
+  .sb-sec { padding: 4px 8px 3px; }
+  .intel-btn { padding: 3px 6px; font-size: .52rem; }
+  .cx-box { padding: 5px 7px; }
+  .sec-toggle { margin-bottom: 2px; font-size: .44rem; }
+  #log-hdr { padding: 5px 8px; }
+  #algo-steps { max-height: 80px; padding: 4px 8px; }
 }

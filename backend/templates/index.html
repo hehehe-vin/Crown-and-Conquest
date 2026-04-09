@@ -295,62 +295,85 @@
       <span class="material-symbols-outlined">chevron_left</span>
     </button>
 
-    <!-- Intel Commands (algorithm selector) — in-world names -->
-    <div class="sb-sec">
-      <div class="sec-lbl">Intel Commands</div>
-      <div id="intel-btns">
-        <!-- Populated by game.js buildIntelButtons() -->
-      </div>
-    </div>
+    <!-- ═ Scrollable middle area ═ -->
+    <div class="sidebar-scroll">
 
-    <!-- Complexity Analysis — collapsed by default to reduce clutter -->
-    <div class="sb-sec">
-      <button class="cx-toggle" id="cx-toggle" aria-expanded="false">
-        <span>Complexity Analysis</span>
-        <span class="cx-arrow">▾</span>
-      </button>
-      <div class="cx-body" id="cx-body">
-        <div class="cx-box">
-          <div class="cx-lbl">TIME COMPLEXITY</div>
-          <div class="cx-val" id="cx-time">O((V+E) log V)</div>
-          <div class="cx-lbl" style="margin-top:5px;">SPACE COMPLEXITY</div>
-          <div class="cx-val" id="cx-space">O(V)</div>
-          <div class="cx-desc" id="cx-desc">Uses a min-heap priority queue. Finds globally optimal shortest paths from source to all vertices. Requires non-negative edge weights.</div>
+      <!-- Intel Commands (algorithm selector) — in-world names -->
+      <div class="sb-sec">
+        <button class="sec-toggle" data-section="intel" aria-expanded="true">
+          <span>Intel Commands</span>
+          <span class="sec-arrow">▾</span>
+        </button>
+        <div class="sec-body" id="intel-body">
+          <div id="intel-btns">
+            <!-- Populated by game.js buildIntelButtons() -->
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Selected territory info -->
-    <div id="info-panel">
-      <div class="sec-lbl">Selected Territory</div>
-      <div id="tinfo">
-        <div style="color:var(--fog);font-size:.68rem;font-style:italic;">
-          Click a territory to inspect it.
+      <!-- Complexity Analysis — collapsed by default to reduce clutter -->
+      <div class="sb-sec">
+        <button class="cx-toggle" id="cx-toggle" aria-expanded="false">
+          <span>Complexity Analysis</span>
+          <span class="cx-arrow">▾</span>
+        </button>
+        <div class="cx-body" id="cx-body">
+          <div class="cx-box">
+            <div class="cx-lbl">TIME COMPLEXITY</div>
+            <div class="cx-val" id="cx-time">O((V+E) log V)</div>
+            <div class="cx-lbl" style="margin-top:5px;">SPACE COMPLEXITY</div>
+            <div class="cx-val" id="cx-space">O(V)</div>
+            <div class="cx-desc" id="cx-desc">Uses a min-heap priority queue. Finds globally optimal shortest paths from source to all vertices. Requires non-negative edge weights.</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Imperial Staff (marshal panel) -->
-    <div id="marshal-panel">
-      <div class="sec-lbl">Imperial Staff</div>
-      <div id="marshal-list">
-        <div style="color:var(--fog);font-size:.6rem;font-style:italic;">Campaign not yet begun.</div>
+      <!-- Selected territory info — collapsible -->
+      <div id="info-panel">
+        <button class="sec-toggle" data-section="territory" aria-expanded="true">
+          <span>Selected Territory</span>
+          <span class="sec-arrow">▾</span>
+        </button>
+        <div class="sec-body" id="territory-body">
+          <div id="tinfo">
+            <div style="color:var(--fog);font-size:.68rem;font-style:italic;">
+              Click a territory to inspect it.
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Animation speed -->
-    <div class="speed-ctrl">
-      <label>SPEED</label>
-      <input type="range" id="spd" min="150" max="1600" value="750" step="100"
-             oninput="setSpeed(this.value)" aria-label="Animation speed"/>
-      <span class="spd-val" id="spd-lbl">1x</span>
-    </div>
+      <!-- Imperial Staff (marshal panel) — collapsible -->
+      <div id="marshal-panel">
+        <button class="sec-toggle" data-section="marshals" aria-expanded="true">
+          <span>Imperial Staff</span>
+          <span class="sec-arrow">▾</span>
+        </button>
+        <div class="sec-body" id="marshals-body">
+          <div id="marshal-list">
+            <div style="color:var(--fog);font-size:.6rem;font-style:italic;">Campaign not yet begun.</div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Action buttons -->
-    <button class="act-btn run" id="run-btn"   onclick="runAlgorithm()">▶ Run Intel</button>
-    <button class="act-btn"    id="conq-btn"   onclick="conquerSelected()" disabled>⚔ Conquer Territory</button>
-    <button class="act-btn end-turn"           onclick="endTurn()">⏭ End Turn</button>
-    <button class="act-btn reset"              onclick="resetGame()">↺ Reset Campaign</button>
+    </div><!-- /.sidebar-scroll -->
+
+    <!-- ═ Pinned bottom actions ═ -->
+    <div class="sidebar-actions">
+      <!-- Animation speed -->
+      <div class="speed-ctrl">
+        <label>SPEED</label>
+        <input type="range" id="spd" min="150" max="1600" value="750" step="100"
+               oninput="setSpeed(this.value)" aria-label="Animation speed"/>
+        <span class="spd-val" id="spd-lbl">1x</span>
+      </div>
+
+      <!-- Action buttons -->
+      <button class="act-btn run" id="run-btn"   onclick="runAlgorithm()">▶ Run Intel</button>
+      <button class="act-btn"    id="conq-btn"   onclick="conquerSelected()" disabled>⚔ Conquer Territory</button>
+      <button class="act-btn end-turn"           onclick="endTurn()">⏭ End Turn</button>
+      <button class="act-btn reset"              onclick="resetGame()">↺ Reset Campaign</button>
+    </div>
   </div>
 
   <!-- Resize handle: sidebar ↔ map -->
@@ -408,8 +431,13 @@
     <div id="log-hdr">⚜ BATTLE CHRONICLE</div>
     <div id="log-body"></div>
     <div id="algo-steps">
-      <div class="steplbl">ALGORITHM TRACE</div>
-      <div id="step-list"></div>
+      <button class="sec-toggle" data-section="algotrace" aria-expanded="true">
+        <span>Algorithm Trace</span>
+        <span class="sec-arrow">▾</span>
+      </button>
+      <div class="sec-body" id="algotrace-body">
+        <div id="step-list"></div>
+      </div>
     </div>
   </div>
 

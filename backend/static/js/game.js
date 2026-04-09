@@ -100,6 +100,72 @@ function initComplexityAccordion() {
   });
 }
 
+// ── COLLAPSIBLE SIDEBAR SECTIONS ───────────────────────────────
+/**
+ * Initialize all .sec-toggle buttons as collapsible section headers.
+ * Each section remembers its collapsed state in localStorage.
+ */
+function initCollapsibleSections() {
+  document.querySelectorAll('.sec-toggle').forEach(toggle => {
+    const section = toggle.dataset.section;
+    const bodyEl  = document.getElementById(`${section}-body`);
+    if (!bodyEl) return;
+
+    // Restore saved state (default: expanded)
+    const savedState = localStorage.getItem(`cc_sec_${section}`);
+    if (savedState === 'collapsed') {
+      bodyEl.classList.add('collapsed');
+      toggle.classList.add('collapsed');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', () => {
+      const isCollapsed = bodyEl.classList.toggle('collapsed');
+      toggle.classList.toggle('collapsed', isCollapsed);
+      toggle.setAttribute('aria-expanded', !isCollapsed);
+      localStorage.setItem(`cc_sec_${section}`, isCollapsed ? 'collapsed' : 'expanded');
+    });
+  });
+
+  // Auto-collapse less-essential sections on short viewports
+  autoCollapseSections();
+  window.addEventListener('resize', debounce(autoCollapseSections, 250));
+}
+
+/**
+ * On short screens (viewport height < 700px), auto-collapse non-essential
+ * sections to prevent overcrowding — but only if user hasn't manually set them.
+ */
+function autoCollapseSections() {
+  const isShort = window.innerHeight < 700;
+  const autoSections = ['territory', 'marshals']; // less-essential on short screens
+
+  autoSections.forEach(section => {
+    const bodyEl  = document.getElementById(`${section}-body`);
+    const toggle  = document.querySelector(`[data-section="${section}"]`);
+    if (!bodyEl || !toggle) return;
+
+    // Only auto-collapse if user hasn't explicitly saved a preference
+    const userPref = localStorage.getItem(`cc_sec_${section}`);
+    if (userPref) return; // user has a preference, respect it
+
+    if (isShort && !bodyEl.classList.contains('collapsed')) {
+      bodyEl.classList.add('collapsed');
+      toggle.classList.add('collapsed');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+/** Simple debounce utility */
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
 // ── GAME START ─────────────────────────────────────────────────
 function startGame() {
   document.getElementById('intro-modal').style.display = 'none';
@@ -243,6 +309,7 @@ function initDragResize(handleId, onDrag) {
 document.addEventListener('DOMContentLoaded', () => {
   buildIntelButtons();
   initComplexityAccordion();
+  initCollapsibleSections();
   initBattleModal();
   initResizeHandles();
 
