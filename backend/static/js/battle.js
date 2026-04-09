@@ -413,6 +413,8 @@ function showConquestModal(data) {
 
 function closeConquestModal() {
   document.getElementById('conquest-modal').style.display = 'none';
+  // Auto-advance turn after each conquest
+  endTurn();
   if (selId !== null) {
     setNS(selId, 'selected');
     updateInfoPanel(selId);
@@ -459,6 +461,8 @@ function showDefeatModal(t, armyCostPaid, extraLoss) {
 
 function closeDefeatModal() {
   document.getElementById('defeat-modal').style.display = 'none';
+  // Auto-advance turn after each battle (even defeats)
+  endTurn();
   if (selId !== null) {
     setNS(selId, 'selected');
     updateInfoPanel(selId);
@@ -479,23 +483,24 @@ function initBattleModal() {
   // btl-advance onclick is set dynamically per battle via initBattleAdvance(t)
 }
 
-// ── END TURN ────────────────────────────────────────────────────
+// ── END TURN (auto-called after each battle) ────────────────────
+// Turn advances automatically when the player closes the conquest
+// or defeat result modal.  No manual button needed.
 function endTurn() {
   res.turn++;
   const playerCities = T.filter(t => t.owner === 'player').length;
   const tax          = playerCities * 100;
   res.gold  += tax;
-  // No free army — must reinforce manually
   // Enemies grow stronger each turn
   T.filter(t => t.owner === 'enemy').forEach(t => { t.units += 250; });
 
   log(`Turn ${res.turn} — Tax: +${tax}g. Enemy forces reinforce.`, 'info');
+  toast(`Turn ${res.turn} · Tax +${tax}g · Enemies reinforce`);
 
   updateRes();
   if (selId !== null) selectT(selId);
 
   autoSave();
-  setTimeout(() => Story.check(), 500);
 }
 
 // ── WIN CHECK — THE LAST PAGE ───────────────────────────────────

@@ -231,7 +231,7 @@ Crown and Conquest/
   - `resources` — army, gold, morale, turn counter
 - **Key Methods:**
   - `invade(country)` — attempt conquest, trigger battle
-  - `end_turn()` — collect taxes, increment turn
+  - `end_turn()` — collect taxes, increment turn (auto-called after each battle)
   - `explore_map_bfs/dfs/dijkstra()` — call algorithms
   - `sync_state()` — keep backend in sync with frontend
   - `choices()` — get available strategic actions
@@ -307,6 +307,7 @@ Crown and Conquest/
 - Marshal ability display
 - Combat result display
 - Victory/defeat messaging
+- Auto turn advancement after each battle
 
 #### story.js
 - Narrative engine
@@ -357,22 +358,26 @@ Display marshal selection modal
            ↓
 Player confirms attack
            ↓
-POST /api/invade with territory name
-           ↓
-game_engine.invade(country):
+Frontend resolves battle locally:
   - Validate territory reachable
   - Deduct invasion cost
   - Calculate attacker/defender strength
-  - war_engine.simulate_battle()
+  - Simulate battle (probability-based)
   - Update controlled territories
-  - Trigger story event if applicable
-  - Return battle result
            ↓
-Backend returns: { result, battle, resources, controlled, message }
+Show conquest/defeat result modal
+           ↓
+Player closes result modal
+           ↓
+Turn auto-advances (endTurn()):
+  - Increment turn counter
+  - Collect tax (n_cities × 100 gold)
+  - Enemy territories reinforce (+250 units)
+  - Toast notification shown
            ↓
 Frontend updates:
   - Refresh UI with new resources
-  - Trigger story event modals
+  - Trigger story event modals (Story.check())
   - Sync backend via /api/sync
   - render.js redraws map
            ↓
@@ -477,7 +482,7 @@ europe_map = {
 | **Army** | 30,000 | Invasion battles (strength = army/1000) | None (static until reinforced) |
 | **Gold** | 600 | Invasion costs (50 × territory cost) | Conquest rewards + taxes/turn |
 | **Morale** | 85 | Battle effectiveness multiplier (0.7 + morale/100 × 0.6) | +5 on victory, -10 on defeat |
-| **Turn** | 1 | Strategy turn counter | +1 each end_turn() |
+| **Turn** | 1 | Strategy turn counter | +1 automatically after each battle |
 
 ### Invasion Mechanics
 ```
@@ -510,15 +515,17 @@ territory_meta = {
 
 ### Turn Progression
 ```
-Player action (invade, reinforce, rally) → resources update
+Battle resolves (victory or defeat)
          ↓
-Player clicks "End Turn"
+Player closes conquest/defeat result modal
          ↓
-Tax collection: n_cities × 100 gold
+endTurn() auto-called:
+  - Turn counter incremented
+  - Tax collection: n_cities × 100 gold
+  - Enemy reinforcement: +250 units per enemy territory
+  - Toast notification: "Turn N · Tax +Xg · Enemies reinforce"
          ↓
-Turn counter incremented
-         ↓
-Resources updated
+Resources updated, UI refreshed
          ↓
 Story events may trigger based on:
   - Territories controlled
@@ -558,7 +565,7 @@ New turn ready
 | GET | `/api/algorithm/dfs` | DFS visualization | {visited, distances, parents} |
 | GET | `/api/algorithm/dijkstra` | Dijkstra visualization | {visited, distances, parents} |
 | GET | `/api/choices` | Strategic actions | [{action, label, description}] |
-| POST | `/api/turn` | End turn, collect taxes | {turn, tax, resources} |
+| POST | `/api/turn` | End turn, collect taxes (legacy — turns now auto-advance on frontend) | {turn, tax, resources} |
 | POST | `/api/sync` | Push state to backend | {synced, resources, controlled} |
 | POST | `/api/save` | Save game progress | {ok} |
 | GET | `/api/load` | Load saved game | {ok, save_data} |
