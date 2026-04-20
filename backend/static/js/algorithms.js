@@ -44,6 +44,7 @@ async function runAlgorithm() {
   if (selId !== null) setNS(selId, 'selected');
 
   const start = 0; // Always start BFS/DFS from Paris
+  playEventCinematic('intel', `${algo} Intel`, 'Computing strategic directives.', 'Intel Command');
 
   // Ping backend for logging (fire-and-forget, don't block animation)
   switch (algo) {
@@ -110,6 +111,7 @@ async function runBFS(start) {
     addStep('Scout Complete ✓', 'cur');
     log(`BFS scouted ${vis.size} territories from Paris.`, 'victory');
     toast(`${vis.size} territories scouted`);
+    playEventCinematic('intel', 'Scout Complete', `${vis.size} territories revealed.`, 'Intel Complete');
     renderMap();
     if (selId !== null) setNS(selId, 'selected');
     // Update conq button if a territory is selected
@@ -157,6 +159,7 @@ async function runDFS(start) {
     addStep('Recon Complete ✓', 'cur');
     log(`DFS traversed ${vis.size} territories.`, 'victory');
     toast(`Deep recon: ${vis.size} territories`);
+    playEventCinematic('intel', 'Recon Complete', `${vis.size} territories traversed.`, 'Intel Complete');
     renderMap();
     if (selId !== null) setNS(selId, 'selected');
     if (selId !== null) refreshConqBtn(selId);
@@ -222,6 +225,7 @@ async function runDijkstra(start) {
     addStep('Routes Computed ✓', 'cur');
     log(`Dijkstra: optimal supply routes to ${vis.size} cities found.`, 'victory');
     toast('Supply routes computed!');
+    playEventCinematic('intel', 'Routes Computed', `${vis.size} paths optimized.`, 'Intel Complete');
     if (selId !== null) {
       setNS(selId, 'selected');
       refreshConqBtn(selId);
@@ -307,6 +311,7 @@ async function runGreedy() {
     addStep('Greedy pass complete ✓', 'cur');
     log('Imperial Acquisitions pass complete.', 'victory');
     toast('Greedy strategy executed!');
+    playEventCinematic('intel', 'Acquisition Pass Complete', 'Resource-priority expansion executed.', 'Intel Complete');
     renderMap();
     if (selId !== null) setNS(selId, 'selected');
   }

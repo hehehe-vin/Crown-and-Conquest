@@ -10,12 +10,373 @@ function svgEl(tag, attrs = {}) {
   return el;
 }
 
+// ── MAP VIEWPORT INTERACTION (PAN + ZOOM) ─────────────────────
+const mapView = {
+  baseX: 0,
+  baseY: 0,
+  baseW: 1000,
+  baseH: 800,
+  x: 0,
+  y: 0,
+  w: 1000,
+  h: 800,
+  minW: 340,
+  maxW: 1000,
+  dragging: false,
+  lastX: 0,
+  lastY: 0,
+};
+
+let overlaysVisible = false;
+let contrastBoost = false;
+const uiScaleSteps = [100, 110, 120, 130];
+let uiScaleIdx = 0;
+const motionModes = ['low', 'medium', 'high'];
+let motionMode = 'medium';
+let cinematicTimer = null;
+
+function playEventCinematic(type, title, subtitle = '', kicker = 'Imperial Dispatch') {
+  const el = document.getElementById('cinematic-event');
+  if (!el) return;
+
+  const cls = ['cinematic-victory', 'cinematic-defeat', 'cinematic-battle', 'cinematic-intel', 'cinematic-chapter'];
+  el.classList.remove(...cls, 'active');
+
+  document.getElementById('cine-kicker').textContent = kicker;
+  document.getElementById('cine-title').textContent = title;
+  document.getElementById('cine-sub').textContent = subtitle || 'The campaign shifts.';
+
+  const map = {
+    victory: 'cinematic-victory',
+    defeat: 'cinematic-defeat',
+    battle: 'cinematic-battle',
+    intel: 'cinematic-intel',
+    chapter: 'cinematic-chapter',
+  };
+  el.classList.add(map[type] || 'cinematic-intel');
+
+  void el.offsetWidth;
+  el.classList.add('active');
+
+  clearTimeout(cinematicTimer);
+  cinematicTimer = setTimeout(() => {
+    el.classList.remove('active');
+  }, motionMode === 'high' ? 2200 : motionMode === 'low' ? 1100 : 1800);
+}
+
+function applyOverlayMode() {
+  const area = document.getElementById('map-area');
+  if (!area) return;
+
+  area.classList.toggle('overlays-on', overlaysVisible);
+  area.classList.toggle('overlays-off', !overlaysVisible);
+
+  const btn = document.getElementById('overlay-toggle-btn');
+  if (btn) btn.textContent = overlaysVisible ? 'Overlay: On' : 'Overlay: Off';
+}
+
+function toggleTerritoryOverlays() {
+  overlaysVisible = !overlaysVisible;
+  applyOverlayMode();
+  localStorage.setItem('cc_overlays_visible', overlaysVisible ? '1' : '0');
+}
+
+function applyContrastMode() {
+  document.body.classList.toggle('contrast-boost', contrastBoost);
+  const btn = document.getElementById('contrast-toggle-btn');
+  if (btn) btn.textContent = contrastBoost ? 'Contrast: On' : 'Contrast: Off';
+}
+
+function toggleContrastMode() {
+  contrastBoost = !contrastBoost;
+  applyContrastMode();
+  localStorage.setItem('cc_contrast_boost', contrastBoost ? '1' : '0');
+}
+
+function applyUiScale() {
+  const pct = uiScaleSteps[uiScaleIdx] || 100;
+  document.documentElement.style.fontSize = `${pct}%`;
+  const btn = document.getElementById('ui-scale-btn');
+  if (btn) btn.textContent = `UI: ${pct}%`;
+}
+
+function cycleUiScale() {
+  uiScaleIdx = (uiScaleIdx + 1) % uiScaleSteps.length;
+  applyUiScale();
+  localStorage.setItem('cc_ui_scale_idx', String(uiScaleIdx));
+}
+
+function applyMotionMode() {
+  document.body.classList.remove('motion-low', 'motion-medium', 'motion-high');
+  document.body.classList.add(`motion-${motionMode}`);
+
+  const btn = document.getElementById('motion-mode-btn');
+  if (!btn) return;
+
+  const label = motionMode === 'low' ? 'Low' : motionMode === 'high' ? 'High' : 'Med';
+  btn.textContent = `Motion: ${label}`;
+}
+
+function cycleMotionMode() {
+  const idx = motionModes.indexOf(motionMode);
+  motionMode = motionModes[(idx + 1) % motionModes.length];
+  applyMotionMode();
+  localStorage.setItem('cc_motion_mode', motionMode);
+}
+
+function clampMapPan() {
+  mapView.w = Math.max(mapView.minW, Math.min(mapView.maxW, mapView.w));
+  mapView.h = mapView.w * (mapView.baseH / mapView.baseW);
+
+  const maxX = mapView.baseX + mapView.baseW - mapView.w;
+  const maxY = mapView.baseY + mapView.baseH - mapView.h;
+
+  mapView.x = Math.min(maxX, Math.max(mapView.baseX, mapView.x));
+  mapView.y = Math.min(maxY, Math.max(mapView.baseY, mapView.y));
+}
+
+function persistMapView() {
+  localStorage.setItem('cc_map_view', JSON.stringify({
+    x: mapView.x,
+    y: mapView.y,
+    w: mapView.w,
+    h: mapView.h,
+  }));
+}
+
+function applyMapTransform() {
+  const svg = document.getElementById('map-svg');
+  if (!svg) return;
+  clampMapPan();
+  svg.setAttribute('viewBox', `${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`);
+}
+
+function zoomMap(factor, cxNorm = 0.5, cyNorm = 0.5) {
+  if (factor <= 0) return;
+
+  const prevW = mapView.w;
+  const prevH = mapView.h;
+
+  const nextW = Math.max(mapView.minW, Math.min(mapView.maxW, prevW / factor));
+  const nextH = nextW * (mapView.baseH / mapView.baseW);
+
+  if (nextW === prevW) return;
+
+  const worldX = mapView.x + cxNorm * prevW;
+  const worldY = mapView.y + cyNorm * prevH;
+
+  mapView.w = nextW;
+  mapView.h = nextH;
+  mapView.x = worldX - cxNorm * nextW;
+  mapView.y = worldY - cyNorm * nextH;
+
+  applyMapTransform();
+  persistMapView();
+}
+
+function resetMapView() {
+  mapView.x = mapView.baseX;
+  mapView.y = mapView.baseY;
+  mapView.w = mapView.baseW;
+  mapView.h = mapView.baseH;
+
+  applyMapTransform();
+  persistMapView();
+}
+
+function initMapInteraction() {
+  const area = document.getElementById('map-area');
+  if (!area) return;
+
+  overlaysVisible = localStorage.getItem('cc_overlays_visible') === '1';
+  applyOverlayMode();
+
+  contrastBoost = localStorage.getItem('cc_contrast_boost') === '1';
+  applyContrastMode();
+
+  const savedScaleIdx = Number(localStorage.getItem('cc_ui_scale_idx'));
+  if (Number.isFinite(savedScaleIdx) && savedScaleIdx >= 0 && savedScaleIdx < uiScaleSteps.length) {
+    uiScaleIdx = savedScaleIdx;
+  }
+  applyUiScale();
+
+  const savedMotionMode = localStorage.getItem('cc_motion_mode');
+  if (savedMotionMode && motionModes.includes(savedMotionMode)) {
+    motionMode = savedMotionMode;
+  }
+  applyMotionMode();
+
+  const saved = localStorage.getItem('cc_map_view');
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      if (Number.isFinite(+s.w) && Number.isFinite(+s.h) && Number.isFinite(+s.x) && Number.isFinite(+s.y)) {
+        mapView.w = +s.w;
+        mapView.h = +s.h;
+        mapView.x = +s.x;
+        mapView.y = +s.y;
+      }
+    } catch {
+      // Ignore malformed saved state
+    }
+  }
+  applyMapTransform();
+
+  area.addEventListener('wheel', (e) => {
+    e.preventDefault();
+
+    const rect = area.getBoundingClientRect();
+    const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+    const cxNorm = (e.clientX - rect.left) / Math.max(1, rect.width);
+    const cyNorm = (e.clientY - rect.top) / Math.max(1, rect.height);
+    zoomMap(factor, cxNorm, cyNorm);
+  }, { passive: false });
+
+  area.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('.map-controls')) return;
+    mapView.dragging = true;
+    mapView.lastX = e.clientX;
+    mapView.lastY = e.clientY;
+    area.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!mapView.dragging) return;
+    const dx = e.clientX - mapView.lastX;
+    const dy = e.clientY - mapView.lastY;
+    mapView.lastX = e.clientX;
+    mapView.lastY = e.clientY;
+
+    const rect = area.getBoundingClientRect();
+    const unitsPerPxX = mapView.w / Math.max(1, rect.width);
+    const unitsPerPxY = mapView.h / Math.max(1, rect.height);
+    mapView.x -= dx * unitsPerPxX;
+    mapView.y -= dy * unitsPerPxY;
+    applyMapTransform();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!mapView.dragging) return;
+    mapView.dragging = false;
+    area.classList.remove('dragging');
+    persistMapView();
+  });
+
+  window.addEventListener('resize', applyMapTransform);
+}
+
+// ── TERRITORY REGION GENERATION (AUTOMATED) ───────────────────
+function clipPolygonByHalfPlane(poly, nx, ny, c) {
+  if (!poly.length) return [];
+  const out = [];
+
+  const inside = (p) => (nx * p.x + ny * p.y) <= c;
+  const intersect = (a, b) => {
+    const va = nx * a.x + ny * a.y - c;
+    const vb = nx * b.x + ny * b.y - c;
+    const t = va / (va - vb);
+    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+  };
+
+  for (let i = 0; i < poly.length; i++) {
+    const cur = poly[i];
+    const prev = poly[(i + poly.length - 1) % poly.length];
+    const curIn = inside(cur);
+    const prevIn = inside(prev);
+
+    if (curIn) {
+      if (!prevIn) out.push(intersect(prev, cur));
+      out.push(cur);
+    } else if (prevIn) {
+      out.push(intersect(prev, cur));
+    }
+  }
+
+  return out;
+}
+
+function insetPolygon(poly, factor = 0.96) {
+  if (poly.length < 3) return poly;
+  const centroid = poly.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+  centroid.x /= poly.length;
+  centroid.y /= poly.length;
+
+  return poly.map(p => ({
+    x: centroid.x + (p.x - centroid.x) * factor,
+    y: centroid.y + (p.y - centroid.y) * factor,
+  }));
+}
+
+function buildTerritoryCells(width, height) {
+  const bounds = [
+    { x: 0, y: 0 },
+    { x: width, y: 0 },
+    { x: width, y: height },
+    { x: 0, y: height },
+  ];
+
+  const cells = {};
+
+  T.forEach(a => {
+    let poly = bounds.slice();
+    T.forEach(b => {
+      if (a.id === b.id || !poly.length) return;
+      const nx = b.x - a.x;
+      const ny = b.y - a.y;
+      const c = (b.x * b.x + b.y * b.y - a.x * a.x - a.y * a.y) / 2;
+      poly = clipPolygonByHalfPlane(poly, nx, ny, c);
+    });
+    cells[a.id] = insetPolygon(poly, 0.96);
+  });
+
+  return cells;
+}
+
+function polygonToPath(poly) {
+  if (!poly || poly.length < 3) return '';
+  const start = poly[0];
+  let d = `M ${start.x.toFixed(2)} ${start.y.toFixed(2)}`;
+  for (let i = 1; i < poly.length; i++) {
+    d += ` L ${poly[i].x.toFixed(2)} ${poly[i].y.toFixed(2)}`;
+  }
+  return d + ' Z';
+}
+
 // ── FULL MAP RENDER ─────────────────────────────────────────────
 function renderMap() {
+  const RL = document.getElementById('region-layer');
   const EL = document.getElementById('edge-layer');
   const NL = document.getElementById('node-layer');
+  RL.innerHTML = '';
   EL.innerHTML = '';
   NL.innerHTML = '';
+
+  const svg = document.getElementById('map-svg');
+  const vb = svg?.viewBox?.baseVal;
+  const mapW = vb?.width || 1000;
+  const mapH = vb?.height || 800;
+
+  // Draw automated territory regions from node coordinates
+  const cells = buildTerritoryCells(mapW, mapH);
+  T.forEach(t => {
+    const effectiveState = getEffectiveState(t);
+    const d = polygonToPath(cells[t.id]);
+    if (!d) return;
+
+    const region = svgEl('path', {
+      id: `r${t.id}`,
+      class: 'tregion',
+      d,
+      'data-region': t.id,
+      'data-state': effectiveState,
+    });
+
+    region.addEventListener('click', () => selectT(t.id));
+    region.addEventListener('mouseenter', e => showTip(t, e));
+    region.addEventListener('mouseleave', hideTip);
+    RL.appendChild(region);
+  });
 
   // Draw edges
   const drawn = new Set();
@@ -31,8 +392,8 @@ function renderMap() {
     EL.appendChild(line);
 
     // Edge weight label
-    const mx = (ta.x + tb.x) / 2;
-    const my = (ta.y + tb.y) / 2;
+    const mx = Math.round((ta.x + tb.x) / 2);
+    const my = Math.round((ta.y + tb.y) / 2);
     const wt = svgEl('text', { x: mx, y: my - 4, class: 'ewt', 'data-wt': key });
     wt.textContent = w;
     EL.appendChild(wt);
@@ -92,6 +453,8 @@ function getEffectiveState(t) {
 function setNS(id, state) {
   const g = document.getElementById(`n${id}`);
   if (g) g.setAttribute('data-state', state);
+  const r = document.getElementById(`r${id}`);
+  if (r) r.setAttribute('data-state', state);
 }
 
 function setEdgeCls(a, b, cls) {

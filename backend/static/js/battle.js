@@ -75,6 +75,8 @@ function openBattle(t) {
   renderMarshalAbilities(t);
   initBattleAdvance(t);
 
+  playEventCinematic('battle', `Battle for ${t.name}`, 'Steel meets destiny.', 'War Council');
+
   document.getElementById('battle-modal').style.display = 'flex';
 }
 
@@ -298,6 +300,7 @@ function handleVictory(t, armyCostPaid, _lossMultDef) {
     log(`Victory! ${t.name} captured.`, 'victory');
   }
   log(lootMsg, 'loot');
+  playEventCinematic('victory', `${t.name} Falls`, 'The Eagle advances.', 'Imperial Triumph');
 
   // Store data for conquest result screen
   lastConquestData = { territory: t, lootMsg, loot, armyCostPaid, armyRefund };
@@ -337,6 +340,7 @@ function handleDefeat(t, armyCostPaid, lossMultOnDefeat) {
   } else {
     log(`Defeat at ${t.name}. Army: ${res.army.toLocaleString()}, Morale: ${res.morale}%`, 'defeat');
   }
+  playEventCinematic('defeat', `${t.name} Holds`, 'The offensive breaks on iron.', 'Field Report');
 
   autoSave();
 
@@ -496,6 +500,7 @@ function endTurn() {
 
   log(`Turn ${res.turn} — Tax: +${tax}g. Enemy forces reinforce.`, 'info');
   toast(`Turn ${res.turn} · Tax +${tax}g · Enemies reinforce`);
+  playEventCinematic('intel', `Turn ${res.turn}`, `Tax +${tax}g · Enemy forces reinforce.`, 'Campaign Ledger');
 
   updateRes();
   if (selId !== null) selectT(selId);

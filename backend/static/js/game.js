@@ -307,7 +307,9 @@ function initDragResize(handleId, onDrag) {
 
 // ── DOMContentLoaded ───────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('app-animate');
   buildIntelButtons();
+  initMapInteraction();
   initComplexityAccordion();
   initCollapsibleSections();
   initBattleModal();

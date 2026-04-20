@@ -149,37 +149,41 @@
 /* ── SHARED BACKDROP ── */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 400;
-  background: rgba(5,2,1,.88);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(233,193,118,.08), rgba(5,2,1,.9) 58%),
+    rgba(5,2,1,.9);
   display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px) saturate(120%);
 }
 
 /* ── SHARED MODAL SHELL ── */
 .modal {
-  background: linear-gradient(160deg,#1c0907 0%,#120805 100%);
-  border: 1px solid rgba(233,193,118,.26);
+  background: linear-gradient(160deg,#1b0b08 0%,#120805 60%, #0d0604 100%);
+  border: 1px solid rgba(233,193,118,.35);
   border-radius: 4px;
   padding: clamp(16px,2.5vw,30px);
   max-width: 560px; width: 94%;
-  box-shadow: 0 0 60px rgba(233,193,118,.06), 0 40px 70px rgba(0,0,0,.8);
+  box-shadow: 0 0 80px rgba(233,193,118,.1), 0 40px 70px rgba(0,0,0,.82);
   text-align: center; position: relative;
   max-height: 90vh; overflow-y: auto;
+  color: #f3deba;
 }
 
 .modal::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg,transparent,var(--gold),transparent);
+  background: linear-gradient(90deg,transparent,var(--gold),rgba(255,220,170,.7),transparent);
 }
 
 .mcrest {
   font-size: 2.2rem;
   margin-bottom: 8px;
+  filter: drop-shadow(0 0 12px rgba(233,193,118,.35));
 }
 
 .mtitle {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1.15rem,1.5vw,1.5rem);
+  font-size: clamp(1.28rem,1.7vw,1.72rem);
   font-weight: 900;
   color: var(--gold);
   letter-spacing: .1em;
@@ -188,20 +192,20 @@
 
 .msub {
   font-family: 'IM Fell English', serif;
-  font-size: clamp(.88rem,1vw,1rem);
-  color: var(--fog);
+  font-size: clamp(1rem,1.14vw,1.14rem);
+  color: #d9c29a;
   margin-bottom: 16px;
-  line-height: 1.65;
+  line-height: 1.72;
 }
 
 .mbtn {
   display: inline-block;
-  padding: 11px 26px; margin: 4px;
+  padding: 12px 26px; margin: 4px;
   background: linear-gradient(135deg,var(--imperial) 0%,#5c1515 100%);
   border: 1px solid rgba(233,193,118,.26);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .84rem; letter-spacing: .12em;
+  font-size: .92rem; letter-spacing: .1em;
   color: var(--gold2); cursor: pointer;
   transition: var(--trans);
   text-transform: uppercase;
@@ -210,6 +214,7 @@
 .mbtn:hover {
   background: linear-gradient(135deg,var(--imperial2) 0%,var(--imperial) 100%);
   transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.45);
 }
 
 .mbtn.sec {
@@ -225,7 +230,7 @@
 /* Win chance display */
 .battle-odds {
   background: rgba(0,0,0,.3);
-  border: 1px solid rgba(233,193,118,.12);
+  border: 1px solid rgba(233,193,118,.24);
   border-radius: var(--radius);
   padding: 10px 14px;
   margin: 10px 0;
@@ -233,15 +238,15 @@
 
 .odds-label {
   font-family: 'Cinzel', serif;
-  font-size: .78rem;
+  font-size: .88rem;
   letter-spacing: .14em;
-  color: var(--fog);
+  color: #d9c29a;
   margin-bottom: 5px;
   text-transform: uppercase;
 }
 
 .odds-bar-bg {
-  height: 8px;
+  height: 10px;
   background: rgba(255,255,255,.08);
   border-radius: 3px;
   overflow: hidden;
@@ -258,15 +263,15 @@
   display: flex;
   justify-content: space-between;
   font-family: 'Cinzel', serif;
-  font-size: .8rem;
+  font-size: .92rem;
 }
 
 /* Army commitment selector */
 .commit-title {
   font-family: 'Cinzel', serif;
-  font-size: .78rem;
+  font-size: .88rem;
   letter-spacing: .12em;
-  color: var(--fog);
+  color: #d9c29a;
   text-transform: uppercase;
   margin: 10px 0 5px;
 }
@@ -278,13 +283,13 @@
 
 .commit-btn {
   flex: 1;
-  padding: 9px 6px;
+  padding: 10px 8px;
   background: rgba(233,193,118,.04);
   border: 1px solid rgba(233,193,118,.14);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .82rem;
-  color: var(--parch);
+  font-size: .92rem;
+  color: #ecd4a7;
   cursor: pointer;
   transition: var(--trans);
   text-align: center;
@@ -295,6 +300,7 @@
   background: rgba(233,193,118,.12);
   border-color: var(--gold);
   color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(255,230,170,.25);
 }
 
 /* Marshal ability row */
@@ -306,12 +312,12 @@
 
 .marshal-ability-btn {
   flex: 1;
-  padding: 8px 8px;
+  padding: 9px 8px;
   background: rgba(26,58,110,.18);
   border: 1px solid rgba(138,180,224,.16);
   border-radius: var(--radius);
   font-family: 'Cinzel', serif;
-  font-size: .74rem; letter-spacing: .04em;
+  font-size: .82rem; letter-spacing: .03em;
   color: #8ab4e0; cursor: pointer;
   transition: var(--trans);
   text-align: center;

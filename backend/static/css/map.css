@@ -4,11 +4,88 @@
 ══════════════════════════════════════════════ */
 
 /* ── EDGES ── */
+.tregion {
+  fill: rgba(233,193,118,.01);
+  stroke: transparent;
+  stroke-width: .8;
+  transition: fill .25s, stroke .25s, filter .25s, opacity .25s;
+  cursor: pointer;
+}
+
+.overlays-on .tregion:hover {
+  stroke: rgba(233,193,118,.45);
+  fill: rgba(233,193,118,.12);
+  filter: brightness(1.07);
+}
+
+@keyframes territory-breathe {
+  0%, 100% { opacity: .96; }
+  50%      { opacity: .84; }
+}
+
+.overlays-on .tregion {
+  animation: territory-breathe 4.4s ease-in-out infinite;
+}
+
+body.motion-low .overlays-on .tregion {
+  animation: none !important;
+}
+
+body.motion-high .overlays-on .tregion {
+  animation-duration: 2.8s;
+}
+
+.overlays-on path.tregion[data-state="conquered"] {
+  fill: rgba(122,184,112,.08);
+  stroke: transparent;
+}
+
+.overlays-on path.tregion[data-state="scouted"] {
+  fill: rgba(233,193,118,.05);
+  stroke: transparent;
+}
+
+.overlays-on path.tregion[data-state="unvisited"] {
+  fill: rgba(233,193,118,.02);
+  stroke: transparent;
+}
+
+.overlays-on path.tregion[data-state="fog"] {
+  fill: rgba(10,8,6,.3);
+  stroke: transparent;
+}
+
+path.tregion[data-state="selected"] {
+  fill: rgba(123,31,31,.2);
+  stroke: rgba(233,193,118,.75);
+  filter: drop-shadow(0 0 10px rgba(233,193,118,.35));
+}
+
+.overlays-on path.tregion[data-state="enemy"] {
+  fill: rgba(248,113,113,.07);
+  stroke: transparent;
+}
+
+/* Hidden-by-default mode: only show selected territory region */
+.overlays-off .tregion {
+  fill: transparent;
+  stroke: transparent;
+  filter: none;
+}
+
+.overlays-off path.tregion[data-state="selected"] {
+  fill: rgba(123,31,31,.22);
+  stroke: rgba(233,193,118,.78);
+  filter: drop-shadow(0 0 10px rgba(233,193,118,.35));
+}
+
+/* ── EDGES ── */
 .edge {
-  stroke-width: 1.8;
+  stroke-width: 2.2;
   fill: none;
-  stroke-opacity: .45;
+  stroke-opacity: .58;
   transition: stroke .3s, stroke-width .3s, stroke-opacity .3s;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,.35));
 }
 
 .edge.frontier {
@@ -19,8 +96,22 @@
 @keyframes da { to { stroke-dashoffset: -20; } }
 
 .edge.active-path {
-  stroke-width: 3;
-  stroke-opacity: .92;
+  stroke-width: 3.6;
+  stroke-opacity: .98;
+  animation: active-route-glow 1.6s ease-in-out infinite;
+}
+
+body.motion-low .edge.active-path {
+  animation: none !important;
+}
+
+body.motion-high .edge.active-path {
+  animation-duration: 1.05s;
+}
+
+@keyframes active-route-glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(233,193,118,.18)); }
+  50%      { filter: drop-shadow(0 0 8px rgba(233,193,118,.42)); }
 }
 
 .edge.traversed {
@@ -31,28 +122,48 @@
 /* ── NODES ── */
 circle.ncirc {
   cursor: pointer;
-  transition: r .18s, fill .3s, stroke .3s, filter .3s;
+  transition: r .18s, fill .3s, stroke .3s, filter .3s, opacity .25s;
 }
 
 circle.ncirc:hover {
-  filter: drop-shadow(0 0 7px rgba(233,193,118,.65));
+  filter: drop-shadow(0 0 11px rgba(233,193,118,.75));
+}
+
+@keyframes node-idle-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(233,193,118,0)); }
+  50%      { filter: drop-shadow(0 0 6px rgba(233,193,118,.16)); }
+}
+
+g[data-state="scouted"] circle.ncirc,
+g[data-state="conquered"] circle.ncirc {
+  animation: node-idle-glow 4.2s ease-in-out infinite;
+}
+
+body.motion-low g[data-state="scouted"] circle.ncirc,
+body.motion-low g[data-state="conquered"] circle.ncirc {
+  animation: none !important;
+}
+
+body.motion-high g[data-state="scouted"] circle.ncirc,
+body.motion-high g[data-state="conquered"] circle.ncirc {
+  animation-duration: 2.6s;
 }
 
 /* States */
 g[data-state="conquered"] circle.ncirc {
-  fill: #2c4025;
-  stroke: #6a9a5a;
+  fill: #273b24;
+  stroke: #84bb72;
   stroke-width: 2.2;
 }
 
 g[data-state="scouted"] circle.ncirc {
-  fill: #c5a059;
-  stroke: rgba(42,20,5,.55);
+  fill: #d1ab66;
+  stroke: rgba(42,20,5,.7);
   stroke-width: 1.8;
 }
 
 g[data-state="unvisited"] circle.ncirc {
-  fill: rgba(40,26,12,.7);
+  fill: rgba(34,24,14,.76);
   stroke: rgba(233,193,118,.18);
   stroke-width: 1.2;
 }
@@ -66,10 +177,10 @@ g[data-state="fog"] circle.ncirc {
 }
 
 g[data-state="selected"] circle.ncirc {
-  fill: #7b1f1f;
+  fill: #8b2520;
   stroke: var(--gold);
-  stroke-width: 2.8;
-  filter: drop-shadow(0 0 10px rgba(233,193,118,.5));
+  stroke-width: 3.1;
+  filter: drop-shadow(0 0 14px rgba(233,193,118,.56));
 }
 
 g[data-state="enemy"] circle.ncirc {
@@ -103,13 +214,13 @@ g[data-state="greedy"] circle.ncirc {
 .nlabel {
   pointer-events: none;
   font-family: 'Cinzel', serif;
-  font-size: 8.5px;
+  font-size: 10.5px;
   font-weight: 700;
   text-anchor: middle;
-  fill: #fff;
+  fill: #fff6dc;
   paint-order: stroke;
   stroke: #000;
-  stroke-width: 2.8px;
+  stroke-width: 3.2px;
   stroke-linejoin: round;
 }
 
@@ -117,7 +228,7 @@ g[data-state="greedy"] circle.ncirc {
 .nlabel-fog {
   pointer-events: none;
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 9.5px;
   font-weight: 700;
   text-anchor: middle;
   fill: rgba(158,144,128,.3);
@@ -129,13 +240,16 @@ g[data-state="greedy"] circle.ncirc {
 
 .ewt {
   font-family: 'Cinzel', serif;
-  font-size: 6.5px;
+  font-size: 9.5px;
   text-anchor: middle;
   pointer-events: none;
-  fill: rgba(255,255,255,.6);
+  fill: rgba(255,246,216,.98);
   paint-order: stroke;
   stroke: #000;
-  stroke-width: 2px;
+  stroke-width: 1.45px;
+  stroke-linejoin: round;
+  text-rendering: geometricPrecision;
+  transition: font-size .2s ease, fill .2s ease;
 }
 
 /* Paris pulse */

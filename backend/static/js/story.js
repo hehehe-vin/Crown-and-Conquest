@@ -416,6 +416,10 @@ const Story = (() => {
     const ch = CHAPTERS[chapterNum];
     if (!ch) return;
 
+    if (typeof playEventCinematic === 'function') {
+      playEventCinematic('chapter', ch.name, ch.epigraph, `Chapter ${ch.numeral}`);
+    }
+
     const overlay = document.getElementById('chapter-transition');
     document.getElementById('ch-numeral').textContent = ch.numeral;
     document.getElementById('ch-name').textContent = ch.name;
