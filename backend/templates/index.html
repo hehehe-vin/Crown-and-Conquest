@@ -229,6 +229,20 @@
   </div>
 </div>
 
+<!-- ════ GAME OVER MODAL ════ -->
+<div class="modal-backdrop" id="gameover-modal" style="display:none;">
+  <div class="modal gameover-inner">
+    <div class="conquest-seal defeat-seal">💀</div>
+    <div class="conquest-title defeat-title">THE CAMPAIGN IS LOST</div>
+    <div class="gameover-body" id="go-body"></div>
+    <div class="story-divider"></div>
+    <div class="gameover-stats" id="go-stats"></div>
+    <button class="story-continue" onclick="resetGame()">
+      ↺ Begin New Campaign
+    </button>
+  </div>
+</div>
+
 <!-- ════ CHAPTER TRANSITION OVERLAY ════ -->
 <div class="chapter-transition" id="chapter-transition">
   <div class="chapter-transition-inner">
@@ -256,7 +270,7 @@
 
 <!-- ════ TOP BAR ════ -->
 <div id="topbar">
-  <div>
+  <div style="min-width:0; flex-shrink:1; overflow:hidden;">
     <div class="brand">Crown &amp; Conquest</div>
     <div class="subtitle">GRANDE ARMÉE · ALGORITHMIC CAMPAIGN · 1805</div>
   </div>
@@ -382,6 +396,7 @@
       <!-- Action buttons -->
       <button class="act-btn run" id="run-btn"   onclick="runAlgorithm()">▶ Run Intel</button>
       <button class="act-btn"    id="conq-btn"   onclick="conquerSelected()" disabled>⚔ Conquer Territory</button>
+      <button class="act-btn recruit" id="recruit-btn" onclick="recruitTroops()">💰 Recruit Troops</button>
       <button class="act-btn reset"              onclick="resetGame()">↺ Reset Campaign</button>
     </div>
   </div>
@@ -405,7 +420,7 @@
         <defs>
           <!-- Coarse Europe landmask to keep overlays off open sea -->
           <clipPath id="land-clip" clipPathUnits="userSpaceOnUse">
-            <path d="M80 185 L165 170 L245 165 L345 145 L435 135 L520 145 L595 170 L660 198 L740 190 L840 214 L910 265 L944 334 L930 405 L898 455 L838 496 L772 540 L710 592 L648 646 L590 701 L525 748 L438 772 L356 758 L280 724 L226 671 L188 607 L154 535 L124 455 L102 372 L90 300 Z" />
+            <path d="M130 250 L195 230 L220 240 L255 255 L260 220 L280 200 L310 185 L380 170 L440 165 L510 180 L560 200 L620 215 L700 210 L780 210 L860 195 L930 220 L950 280 L930 370 L900 420 L850 480 L790 530 L710 560 L620 580 L530 630 L480 650 L440 680 L400 660 L350 620 L290 560 L240 500 L195 440 L160 380 L140 320 Z" />
           </clipPath>
         </defs>
         <g id="region-layer" clip-path="url(#land-clip)"></g>
@@ -414,15 +429,43 @@
       </svg>
     </div>
 
-    <!-- Map controls -->
+    <!-- Map controls — compact layout -->
     <div class="map-controls">
       <button type="button" class="map-ctrl-btn" onclick="zoomMap(1.15)" title="Zoom in">＋</button>
       <button type="button" class="map-ctrl-btn" onclick="zoomMap(1/1.15)" title="Zoom out">－</button>
-      <button type="button" class="map-ctrl-btn reset" onclick="resetMapView()" title="Reset map view">Reset</button>
-      <button type="button" class="map-ctrl-btn overlay" id="overlay-toggle-btn" onclick="toggleTerritoryOverlays()" title="Toggle territory overlays">Overlay: Off</button>
-      <button type="button" class="map-ctrl-btn contrast" id="contrast-toggle-btn" onclick="toggleContrastMode()" title="Toggle high contrast mode">Contrast: Off</button>
-      <button type="button" class="map-ctrl-btn ui" id="ui-scale-btn" onclick="cycleUiScale()" title="Cycle UI size">UI: 100%</button>
-      <button type="button" class="map-ctrl-btn motion" id="motion-mode-btn" onclick="cycleMotionMode()" title="Cycle animation intensity">Motion: Med</button>
+      <button type="button" class="map-ctrl-btn" id="settings-gear-btn" onclick="toggleSettingsPopup()" title="Display settings">
+        <span class="material-symbols-outlined" style="font-size:16px;">settings</span>
+      </button>
+    </div>
+
+    <!-- Settings popup — hidden by default -->
+    <div class="settings-popup" id="settings-popup" style="display:none;">
+      <div class="settings-header">Display Settings</div>
+      <button type="button" class="settings-option" id="overlay-toggle-btn" onclick="cycleOverlayMode()">
+        <span class="settings-label">Map Intel Mode</span>
+        <span class="settings-value">Off</span>
+        <span class="settings-hint">Cycle: Off → Ownership → Threat → Wealth → Reachable → Routes</span>
+      </button>
+      <button type="button" class="settings-option" id="contrast-toggle-btn" onclick="toggleContrastMode()">
+        <span class="settings-label">High Contrast</span>
+        <span class="settings-value">Off</span>
+        <span class="settings-hint">Brighten text &amp; borders for visibility</span>
+      </button>
+      <button type="button" class="settings-option" id="ui-scale-btn" onclick="cycleUiScale()">
+        <span class="settings-label">UI Scale</span>
+        <span class="settings-value">100%</span>
+        <span class="settings-hint">Increase text and panel sizes</span>
+      </button>
+      <button type="button" class="settings-option" id="motion-mode-btn" onclick="cycleMotionMode()">
+        <span class="settings-label">Animations</span>
+        <span class="settings-value">Medium</span>
+        <span class="settings-hint">Low = reduced motion for accessibility</span>
+      </button>
+      <button type="button" class="settings-option" onclick="resetMapView()">
+        <span class="settings-label">Reset Map View</span>
+        <span class="settings-value">⟳</span>
+        <span class="settings-hint">Reset zoom and pan to default</span>
+      </button>
     </div>
 
     <!-- Top-right HUD -->
@@ -491,6 +534,7 @@
 -->
 <script src="/static/js/data.js"></script>
 <script src="/static/js/render.js"></script>
+<script src="/static/js/screen_queue.js"></script>
 <script src="/static/js/algorithms.js"></script>
 <script src="/static/js/battle.js"></script>
 <script src="/static/js/story.js"></script>

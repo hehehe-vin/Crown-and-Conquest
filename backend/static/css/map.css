@@ -12,71 +12,55 @@
   cursor: pointer;
 }
 
-.overlays-on .tregion:hover {
-  stroke: rgba(233,193,118,.45);
-  fill: rgba(233,193,118,.12);
-  filter: brightness(1.07);
-}
+/* ── OVERLAY MODES ── */
 
-@keyframes territory-breathe {
-  0%, 100% { opacity: .96; }
-  50%      { opacity: .84; }
-}
-
-.overlays-on .tregion {
-  animation: territory-breathe 4.4s ease-in-out infinite;
-}
-
-body.motion-low .overlays-on .tregion {
-  animation: none !important;
-}
-
-body.motion-high .overlays-on .tregion {
-  animation-duration: 2.8s;
-}
-
-.overlays-on path.tregion[data-state="conquered"] {
-  fill: rgba(122,184,112,.08);
-  stroke: transparent;
-}
-
-.overlays-on path.tregion[data-state="scouted"] {
-  fill: rgba(233,193,118,.05);
-  stroke: transparent;
-}
-
-.overlays-on path.tregion[data-state="unvisited"] {
-  fill: rgba(233,193,118,.02);
-  stroke: transparent;
-}
-
-.overlays-on path.tregion[data-state="fog"] {
-  fill: rgba(10,8,6,.3);
-  stroke: transparent;
-}
-
-path.tregion[data-state="selected"] {
-  fill: rgba(123,31,31,.2);
-  stroke: rgba(233,193,118,.75);
-  filter: drop-shadow(0 0 10px rgba(233,193,118,.35));
-}
-
-.overlays-on path.tregion[data-state="enemy"] {
-  fill: rgba(248,113,113,.07);
-  stroke: transparent;
-}
-
-/* Hidden-by-default mode: only show selected territory region */
-.overlays-off .tregion {
+/* Default: minimal overlay */
+.overlay-off .tregion {
   fill: transparent;
   stroke: transparent;
   filter: none;
 }
 
-.overlays-off path.tregion[data-state="selected"] {
+/* Selected territory always visible regardless of mode */
+path.tregion[data-state="selected"] {
   fill: rgba(123,31,31,.22);
   stroke: rgba(233,193,118,.78);
   filter: drop-shadow(0 0 10px rgba(233,193,118,.35));
+}
+
+/* Ownership mode — colored by owner */
+.overlay-ownership .tregion[data-state="conquered"] { fill: rgba(122,184,112,.18); stroke: rgba(122,184,112,.35); stroke-width: 1.5; }
+.overlay-ownership .tregion[data-state="scouted"]   { fill: rgba(233,193,118,.12); stroke: rgba(233,193,118,.2); stroke-width: 1; }
+.overlay-ownership .tregion[data-state="unvisited"]  { fill: rgba(100,80,60,.06); }
+.overlay-ownership .tregion[data-state="fog"]        { fill: rgba(10,8,6,.45); filter: saturate(30%); }
+.overlay-ownership .tregion[data-state="enemy"]      { fill: rgba(248,113,113,.16); stroke: rgba(248,113,113,.25); stroke-width: 1; }
+
+/* Threat & Wealth modes — fills set dynamically by JS (applyHeatMapOverlay) */
+.overlay-threat .tregion,
+.overlay-wealth .tregion {
+  transition: fill .4s ease;
+}
+
+/* Reachable mode — pulsing borders set by JS (applyReachableOverlay) */
+.overlay-reachable .tregion {
+  transition: fill .3s, stroke .3s;
+}
+
+@keyframes reachable-pulse {
+  0%, 100% { stroke-opacity: .3; }
+  50%      { stroke-opacity: .9; }
+}
+
+.overlay-reachable .tregion[data-reachable="true"] {
+  animation: reachable-pulse 2s ease-in-out infinite;
+}
+
+/* Routes mode — Dijkstra paths stay visible, other overlays minimal */
+.overlay-routes .tregion { fill: transparent; }
+.overlay-routes .edge.active-path {
+  stroke-width: 3.6;
+  stroke-opacity: .98;
+  stroke: #e9c176;
 }
 
 /* ── EDGES ── */

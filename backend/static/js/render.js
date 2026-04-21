@@ -27,7 +27,8 @@ const mapView = {
   lastY: 0,
 };
 
-let overlaysVisible = false;
+const OVERLAY_MODES = ['off', 'ownership', 'threat', 'wealth', 'reachable', 'routes'];
+let overlayModeIdx = 0;
 let contrastBoost = false;
 const uiScaleSteps = [100, 110, 120, 130];
 let uiScaleIdx = 0;
@@ -39,52 +40,174 @@ function playEventCinematic(type, title, subtitle = '', kicker = 'Imperial Dispa
   const el = document.getElementById('cinematic-event');
   if (!el) return;
 
-  const cls = ['cinematic-victory', 'cinematic-defeat', 'cinematic-battle', 'cinematic-intel', 'cinematic-chapter'];
+  const cls = ['cinematic-victory', 'cinematic-defeat', 'cinematic-battle',
+               'cinematic-intel', 'cinematic-chapter', 'cinematic-story'];
   el.classList.remove(...cls, 'active');
 
   document.getElementById('cine-kicker').textContent = kicker;
-  document.getElementById('cine-title').textContent = title;
-  document.getElementById('cine-sub').textContent = subtitle || 'The campaign shifts.';
+  document.getElementById('cine-title').textContent  = title;
+  document.getElementById('cine-sub').textContent    = subtitle || 'The campaign shifts.';
 
   const map = {
     victory: 'cinematic-victory',
-    defeat: 'cinematic-defeat',
-    battle: 'cinematic-battle',
-    intel: 'cinematic-intel',
+    defeat:  'cinematic-defeat',
+    battle:  'cinematic-battle',
+    intel:   'cinematic-intel',
     chapter: 'cinematic-chapter',
+    story:   'cinematic-story',
   };
   el.classList.add(map[type] || 'cinematic-intel');
 
   void el.offsetWidth;
   el.classList.add('active');
 
+  const dur = motionMode === 'high' ? 2200 : motionMode === 'low' ? 1100 : 1800;
+
   clearTimeout(cinematicTimer);
   cinematicTimer = setTimeout(() => {
     el.classList.remove('active');
-  }, motionMode === 'high' ? 2200 : motionMode === 'low' ? 1100 : 1800);
+  }, dur);
+}
+
+/**
+ * Promise wrapper — resolves when cinematic animation ends.
+ * Used by ScreenQueue to await cinematic completion before showing a modal.
+ */
+function playCinematicPromise(type, title, subtitle, kicker) {
+  return new Promise(resolve => {
+    playEventCinematic(type, title, subtitle, kicker);
+    const dur = motionMode === 'high' ? 2400 : motionMode === 'low' ? 1300 : 2000;
+    setTimeout(resolve, dur);
+  });
+}
+
+function getOverlayMode() {
+  return OVERLAY_MODES[overlayModeIdx];
+}
+
+function cycleOverlayMode() {
+  overlayModeIdx = (overlayModeIdx + 1) % OVERLAY_MODES.length;
+  applyOverlayMode();
+  localStorage.setItem('cc_overlay_mode', String(overlayModeIdx));
+}
+
+function setOverlayMode(mode) {
+  const idx = OVERLAY_MODES.indexOf(mode);
+  if (idx >= 0) {
+    overlayModeIdx = idx;
+    applyOverlayMode();
+  }
 }
 
 function applyOverlayMode() {
   const area = document.getElementById('map-area');
   if (!area) return;
 
-  area.classList.toggle('overlays-on', overlaysVisible);
-  area.classList.toggle('overlays-off', !overlaysVisible);
+  T.forEach(t => {
+    const region = document.getElementById(`r${t.id}`);
+    if (!region) return;
+    region.style.fill = '';
+    region.style.stroke = '';
+    region.style.strokeWidth = '';
+    region.removeAttribute('data-reachable');
+  });
 
+  // Remove all overlay classes
+  OVERLAY_MODES.forEach(m => area.classList.remove(`overlay-${m}`));
+  // Add current
+  const mode = OVERLAY_MODES[overlayModeIdx];
+  area.classList.add(`overlay-${mode}`);
+
+  // Apply dynamic styles for threat/wealth modes
+  if (mode === 'threat' || mode === 'wealth') {
+    applyHeatMapOverlay(mode);
+  }
+  if (mode === 'reachable') {
+    applyReachableOverlay();
+  }
+  if (mode === 'routes') {
+    applyRoutesOverlay();
+  }
+
+  // Update settings popup value text
   const btn = document.getElementById('overlay-toggle-btn');
-  if (btn) btn.textContent = overlaysVisible ? 'Overlay: On' : 'Overlay: Off';
+  if (btn) {
+    const valueEl = btn.querySelector('.settings-value');
+    if (valueEl) {
+      const labels = { off:'Off', ownership:'Ownership', threat:'Threat',
+                       wealth:'Wealth', reachable:'Reachable', routes:'Routes' };
+      valueEl.textContent = labels[mode] || mode;
+    }
+  }
 }
 
-function toggleTerritoryOverlays() {
-  overlaysVisible = !overlaysVisible;
-  applyOverlayMode();
-  localStorage.setItem('cc_overlays_visible', overlaysVisible ? '1' : '0');
+function applyHeatMapOverlay(mode) {
+  // Compute max value for normalization
+  const enemies = T.filter(t => t.owner !== 'player');
+  if (!enemies.length) return;
+
+  const maxVal = mode === 'threat'
+    ? Math.max(...enemies.map(t => t.units))
+    : Math.max(...enemies.map(t => t.gold));
+
+  T.forEach(t => {
+    const region = document.getElementById(`r${t.id}`);
+    if (!region) return;
+
+    if (t.owner === 'player') {
+      region.style.fill = 'rgba(122,184,112,.15)';
+      region.style.stroke = 'rgba(122,184,112,.25)';
+      return;
+    }
+
+    const val = mode === 'threat' ? t.units : t.gold;
+    const intensity = maxVal > 0 ? (val / maxVal) : 0;
+
+    if (mode === 'threat') {
+      region.style.fill = `rgba(248,113,113,${0.1 + intensity * 0.45})`;
+      region.style.stroke = `rgba(248,113,113,${0.15 + intensity * 0.35})`;
+    } else {
+      region.style.fill = `rgba(233,193,118,${0.1 + intensity * 0.45})`;
+      region.style.stroke = `rgba(233,193,118,${0.15 + intensity * 0.35})`;
+    }
+  });
+}
+
+function applyReachableOverlay() {
+  const reachable = getReachable();
+  T.forEach(t => {
+    const region = document.getElementById(`r${t.id}`);
+    if (!region) return;
+
+    if (reachable.includes(t.id) && t.owner !== 'player') {
+      region.style.fill = 'rgba(138,180,224,.22)';
+      region.style.stroke = 'rgba(138,180,224,.7)';
+      region.style.strokeWidth = '2.5';
+      region.setAttribute('data-reachable', 'true');
+    } else if (t.owner === 'player') {
+      region.style.fill = 'rgba(122,184,112,.12)';
+    }
+  });
+}
+
+function applyRoutesOverlay() {
+  if (!lastComputedPaths || !lastComputedPaths.prev) return;
+  const prev = lastComputedPaths.prev;
+  Object.keys(prev).forEach(nodeId => {
+    const id = Number(nodeId);
+    if (prev[id] !== undefined && prev[id] !== null) {
+      setEdgeCls(prev[id], id, 'active-path');
+    }
+  });
 }
 
 function applyContrastMode() {
   document.body.classList.toggle('contrast-boost', contrastBoost);
   const btn = document.getElementById('contrast-toggle-btn');
-  if (btn) btn.textContent = contrastBoost ? 'Contrast: On' : 'Contrast: Off';
+  if (btn) {
+    const valueEl = btn.querySelector('.settings-value');
+    if (valueEl) valueEl.textContent = contrastBoost ? 'On' : 'Off';
+  }
 }
 
 function toggleContrastMode() {
@@ -97,7 +220,10 @@ function applyUiScale() {
   const pct = uiScaleSteps[uiScaleIdx] || 100;
   document.documentElement.style.fontSize = `${pct}%`;
   const btn = document.getElementById('ui-scale-btn');
-  if (btn) btn.textContent = `UI: ${pct}%`;
+  if (btn) {
+    const valueEl = btn.querySelector('.settings-value');
+    if (valueEl) valueEl.textContent = `${pct}%`;
+  }
 }
 
 function cycleUiScale() {
@@ -111,10 +237,13 @@ function applyMotionMode() {
   document.body.classList.add(`motion-${motionMode}`);
 
   const btn = document.getElementById('motion-mode-btn');
-  if (!btn) return;
-
-  const label = motionMode === 'low' ? 'Low' : motionMode === 'high' ? 'High' : 'Med';
-  btn.textContent = `Motion: ${label}`;
+  if (btn) {
+    const valueEl = btn.querySelector('.settings-value');
+    if (valueEl) {
+      const label = motionMode === 'low' ? 'Low' : motionMode === 'high' ? 'High' : 'Medium';
+      valueEl.textContent = label;
+    }
+  }
 }
 
 function cycleMotionMode() {
@@ -123,6 +252,22 @@ function cycleMotionMode() {
   applyMotionMode();
   localStorage.setItem('cc_motion_mode', motionMode);
 }
+
+function toggleSettingsPopup() {
+  const popup = document.getElementById('settings-popup');
+  if (!popup) return;
+  const visible = popup.style.display !== 'none';
+  popup.style.display = visible ? 'none' : 'block';
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+  const popup = document.getElementById('settings-popup');
+  if (!popup || popup.style.display === 'none') return;
+  if (!e.target.closest('.settings-popup') && !e.target.closest('#settings-gear-btn')) {
+    popup.style.display = 'none';
+  }
+});
 
 function clampMapPan() {
   mapView.w = Math.max(mapView.minW, Math.min(mapView.maxW, mapView.w));
@@ -188,7 +333,10 @@ function initMapInteraction() {
   const area = document.getElementById('map-area');
   if (!area) return;
 
-  overlaysVisible = localStorage.getItem('cc_overlays_visible') === '1';
+  const savedOverlay = Number(localStorage.getItem('cc_overlay_mode'));
+  if (Number.isFinite(savedOverlay) && savedOverlay >= 0 && savedOverlay < OVERLAY_MODES.length) {
+    overlayModeIdx = savedOverlay;
+  }
   applyOverlayMode();
 
   contrastBoost = localStorage.getItem('cc_contrast_boost') === '1';
@@ -327,7 +475,7 @@ function buildTerritoryCells(width, height) {
       const c = (b.x * b.x + b.y * b.y - a.x * a.x - a.y * a.y) / 2;
       poly = clipPolygonByHalfPlane(poly, nx, ny, c);
     });
-    cells[a.id] = insetPolygon(poly, 0.96);
+    cells[a.id] = insetPolygon(poly, 0.88);
   });
 
   return cells;
@@ -441,6 +589,8 @@ function renderMap() {
     g.addEventListener('mouseleave', hideTip);
     NL.appendChild(g);
   });
+
+  applyOverlayMode();
 }
 
 /** Determine the visual state for a territory, considering fog */
@@ -525,7 +675,10 @@ function updateInfoPanel(id) {
     const atkStrength = Math.max(1, Math.floor(res.army * battleState.commitFraction * 0.6));
     const moraleMult  = 0.7 + (res.morale / 100) * 0.6;
     const effAtk      = atkStrength * moraleMult;
-    const winPct      = Math.min(98, Math.max(2, Math.round(effAtk / (effAtk + t.units) * 100)));
+    const terrMult    = TERRAIN_MULT[t.type] || 1.0;
+    const effDef      = t.units * terrMult;
+    const ratio       = effAtk / Math.max(1, effDef);
+    const winPct      = Math.min(98, Math.max(2, Math.round((ratio / (ratio + 1)) * 100)));
     const barColor    = winPct >= 60 ? '#7ab870' : winPct >= 40 ? '#e9c176' : '#f87171';
     winChanceHtml = `
       <div class="trow" style="margin-top:5px;">
@@ -542,7 +695,12 @@ function updateInfoPanel(id) {
       <div class="tname">${icon}${fog ? '???' : t.name}</div>
       <div class="trow"><span class="tkey">Type</span>${fog ? hiddenVal('') : `<span class="tval">${ttype}</span>`}</div>
       <div class="trow"><span class="tkey">Control</span><span class="tval">${ownedLabel}</span></div>
-      <div class="trow"><span class="tkey">Garrison</span>${hiddenVal(t.units.toLocaleString())}</div>
+      <div class="trow"><span class="tkey">Garrison</span>${(() => {
+      if (fog) return '<span class="tval fog-hidden">— — —</span>';
+      const g = getGarrisonDisplay(t);
+      if (g.exact) return `<span class="tval">${g.label}</span>`;
+      return `<span class="tval" style="color:#e9c176;">${g.label} <small>⚠ est.</small></span>`;
+    })()}</div>
       <div class="trow"><span class="tkey">Gold Reward</span>${hiddenVal(t.gold > 0 ? t.gold + 'g' : '—')}</div>
       <div class="trow"><span class="tkey">Inv. Cost</span>${hiddenCost(t)}</div>
       ${winChanceHtml}
@@ -614,6 +772,31 @@ function refreshConqBtn(id) {
   const canAttack = reachable.includes(id) && t.owner !== 'player';
   const goldOk    = res.gold >= t.cost * 50;
   const armyOk    = res.army >= 500; // minimum meaningful force
+
+  // BFS scan check
+  if (!t.bfsScanned && t.owner !== 'player') {
+    btn.textContent = '🔍 Run BFS to Scout';
+    btn.disabled = true;
+    return;
+  }
+
+  // Attack cooldown
+  if (attackCooldowns[id] && res.turn < attackCooldowns[id]) {
+    btn.textContent = '⏳ Regrouping...';
+    btn.disabled = true;
+    return;
+  }
+
+  // Capital gate
+  if (t.type === 'capital' && t.owner === 'enemy' && CAPITAL_GATES[id]) {
+    const required = CAPITAL_GATES[id];
+    const owned = T.filter(x => x.owner === 'player').length;
+    if (owned < required) {
+      btn.textContent = `🔒 Need ${required} territories`;
+      btn.disabled = true;
+      return;
+    }
+  }
 
   btn.disabled = !canAttack;
 

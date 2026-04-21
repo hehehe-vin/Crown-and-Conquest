@@ -325,6 +325,11 @@ document.addEventListener('DOMContentLoaded', () => {
   Story.updateMarshals();
   Story.updateChapter();
 
+  // Greedy reset on chapter change
+  Story.onChapterChange(() => {
+    greedyUsedThisChapter = false;
+  });
+
   // Auth: check session → show login or intro
   Auth.initKeyboard();
   Auth.checkSession();

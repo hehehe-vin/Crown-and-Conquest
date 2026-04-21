@@ -25,16 +25,61 @@ function setSpeed(v) {
   document.getElementById('spd-lbl').textContent = ratio.toFixed(1) + 'x';
 }
 
+// ── ALGORITHM COSTS & LIMITS ───────────────────────────────────
+const ALGO_COSTS = {
+  BFS:      100,
+  DFS:      400,
+  Dijkstra: 300,
+  Greedy:   500,
+};
+
+let greedyUsedThisChapter = false;
+let lastComputedPaths = {};   // Dijkstra results — persisted for overlay mode 'routes'
+let firstBfsDone = localStorage.getItem('cc_first_bfs_done') === '1';
+
 // ── MAIN RUNNER ─────────────────────────────────────────────────
 async function runAlgorithm() {
+  // ── STOP RUNNING ALGORITHM ──
   if (running) {
-    // Stop current run
     abortFlag = true;
     running   = false;
     document.getElementById('run-btn').textContent = '▶ Run Intel';
+    // Reset map to clean state — removes visiting/queued visual artifacts
+    renderMap();
+    if (selId !== null) setNS(selId, 'selected');
     return;
   }
 
+  // ── COST CHECK ──
+  const cost = ALGO_COSTS[algo] || 0;
+  const isFreeFirstBfs = (algo === 'BFS' && !firstBfsDone);
+  const actualCost = isFreeFirstBfs ? 0 : cost;
+
+  if (res.gold < actualCost) {
+    toast(`Insufficient gold — ${algo} Intel costs ${cost}g`);
+    log(`Cannot afford ${algo} Intel (${cost}g required, ${res.gold}g available).`, 'defeat');
+    return;
+  }
+
+  // ── GREEDY: 1 PER CHAPTER LIMIT ──
+  if (algo === 'Greedy' && greedyUsedThisChapter) {
+    toast('Imperial Acquisitions already deployed this chapter.');
+    log('Greedy strategy exhausted for this campaign phase.', 'info');
+    return;
+  }
+
+  // ── DEDUCT COST ──
+  res.gold -= actualCost;
+  if (isFreeFirstBfs) {
+    firstBfsDone = true;
+    localStorage.setItem('cc_first_bfs_done', '1');
+    log('First BFS scout — complimentary reconnaissance.', 'info');
+  } else if (actualCost > 0) {
+    log(`Intel expenditure: -${actualCost}g for ${algo} operations.`, 'info');
+  }
+  updateRes();
+
+  // ── START RUN ──
   abortFlag = false;
   running   = true;
   document.getElementById('run-btn').textContent = '⏹ Stop';
@@ -43,25 +88,33 @@ async function runAlgorithm() {
   renderMap();
   if (selId !== null) setNS(selId, 'selected');
 
-  const start = 0; // Always start BFS/DFS from Paris
-  playEventCinematic('intel', `${algo} Intel`, 'Computing strategic directives.', 'Intel Command');
+  // No cinematic at algorithm START — just a toast
+  toast(`${algo} Intel — Computing strategic directives...`);
 
-  // Ping backend for logging (fire-and-forget, don't block animation)
+  const start = 0; // Always start from Paris
+
   switch (algo) {
     case 'BFS':
-      apiGet('/explore/bfs').then(r => { if (r) log(`BFS backend: ${r.order.length} territories scanned.`, 'algo'); });
+      apiGet('/explore/bfs').then(r => {
+        if (r) log(`BFS backend: ${r.order.length} territories scanned.`, 'algo');
+      });
       await runBFS(start);
       break;
     case 'DFS':
-      apiGet('/explore/dfs').then(r => { if (r) log(`DFS backend: ${r.order.length} nodes traversed.`, 'algo'); });
+      apiGet('/explore/dfs').then(r => {
+        if (r) log(`DFS backend: ${r.order.length} nodes traversed.`, 'algo');
+      });
       await runDFS(start);
       break;
     case 'Dijkstra':
-      apiGet('/routes').then(r => { if (r) log(`Dijkstra backend: paths to ${Object.keys(r.distances).length} cities.`, 'algo'); });
+      apiGet('/routes').then(r => {
+        if (r) log(`Dijkstra backend: paths to ${Object.keys(r.distances).length} cities.`, 'algo');
+      });
       await runDijkstra(start);
       break;
     case 'Greedy':
       await runGreedy();
+      greedyUsedThisChapter = true;
       break;
   }
 
@@ -82,6 +135,10 @@ async function runBFS(start) {
   while (queue.length && !abortFlag) {
     const u = queue.shift();
     const t = T[u];
+
+    // ── GAMEPLAY: Mark territory as BFS-scanned ──
+    T[u].bfsScanned = true;
+    revealTerritory(u);
 
     if (u !== selId) setNS(u, 'visiting');
     addStep(`L${level} Visit: ${t.name}`, 'cur');
@@ -111,7 +168,11 @@ async function runBFS(start) {
     addStep('Scout Complete ✓', 'cur');
     log(`BFS scouted ${vis.size} territories from Paris.`, 'victory');
     toast(`${vis.size} territories scouted`);
-    playEventCinematic('intel', 'Scout Complete', `${vis.size} territories revealed.`, 'Intel Complete');
+    // Completion cinematic — only if not stopped and not blocked
+    if (!abortFlag && !ScreenQueue.isBlocked()) {
+      playEventCinematic('intel', 'Reconnaissance Complete',
+        `${T.filter(t => t.bfsScanned).length} territories mapped.`, 'Intel Command');
+    }
     renderMap();
     if (selId !== null) setNS(selId, 'selected');
     // Update conq button if a territory is selected
@@ -131,9 +192,15 @@ async function runDFS(start) {
     vis.add(u);
     const t = T[u];
 
+    // ── GAMEPLAY: Mark territory as DFS deep-scanned ──
+    T[u].dfsScanned = true;
+    T[u].bfsScanned = true;  // DFS also reveals (superset of BFS)
+    revealTerritory(u);
+
     if (u !== selId) setNS(u, 'visiting');
     addStep(`Visit: ${t.name} (depth ${vis.size})`, 'cur');
     log(`DFS → ${t.name}`, 'algo');
+    log(`Deep recon: ${T[u].name} — garrison confirmed: ${T[u].units.toLocaleString()}`, 'algo');
 
     await sleep(animMs);
     if (abortFlag) return;
@@ -159,7 +226,10 @@ async function runDFS(start) {
     addStep('Recon Complete ✓', 'cur');
     log(`DFS traversed ${vis.size} territories.`, 'victory');
     toast(`Deep recon: ${vis.size} territories`);
-    playEventCinematic('intel', 'Recon Complete', `${vis.size} territories traversed.`, 'Intel Complete');
+    if (!abortFlag && !ScreenQueue.isBlocked()) {
+      playEventCinematic('intel', 'Deep Intel Acquired',
+        `${T.filter(t => t.dfsScanned).length} territories fully surveyed.`, 'Intelligence Bureau');
+    }
     renderMap();
     if (selId !== null) setNS(selId, 'selected');
     if (selId !== null) refreshConqBtn(selId);
@@ -214,6 +284,23 @@ async function runDijkstra(start) {
 
   if (!abortFlag) {
     renderMap();
+    // ── GAMEPLAY: Clear previous Dijkstra markings ──
+    T.forEach(t => { t.onDijkstraPath = false; });
+
+    // ── GAMEPLAY: Mark territories on the optimal path tree ──
+    // 'prev' is the predecessor array from Dijkstra
+    Object.keys(prev).forEach(nodeId => {
+      const id = Number(nodeId);
+      if (prev[id] !== undefined && prev[id] !== null) {
+        T[id].onDijkstraPath = true;
+        T[id].bfsScanned = true;  // Dijkstra also reveals
+        revealTerritory(id);
+      }
+    });
+
+    // Store paths for the 'routes' overlay mode
+    lastComputedPaths = { prev: { ...prev }, dist: { ...dist } };
+
     // Highlight optimal paths with gold edges
     T.forEach(t => {
       let n = t.id;
@@ -225,7 +312,13 @@ async function runDijkstra(start) {
     addStep('Routes Computed ✓', 'cur');
     log(`Dijkstra: optimal supply routes to ${vis.size} cities found.`, 'victory');
     toast('Supply routes computed!');
-    playEventCinematic('intel', 'Routes Computed', `${vis.size} paths optimized.`, 'Intel Complete');
+    if (!abortFlag && !ScreenQueue.isBlocked()) {
+      playEventCinematic('intel', 'Supply Routes Optimized',
+        'Conquest costs reduced along computed paths.', 'Logistics Corps');
+    }
+
+    // Auto-switch overlay to 'routes' mode
+    setOverlayMode('routes');
     if (selId !== null) {
       setNS(selId, 'selected');
       refreshConqBtn(selId);
@@ -241,8 +334,16 @@ async function runGreedy() {
   log('Greedy: prioritise highest gold/cost ratio.', 'algo');
 
   let turns = 0;
+  let greedyConquests = 0;
+  const GREEDY_MAX = 3;
 
   while (turns < 10 && !abortFlag) {
+    // Inside the greedy loop, BEFORE each conquest:
+    if (greedyConquests >= GREEDY_MAX) {
+      log(`Imperial Acquisitions: maximum ${GREEDY_MAX} conquests reached.`, 'info');
+      break;
+    }
+
     turns++;
     // Only consider revealed, scouted, non-player territories that are reachable
     const reachableIds = getReachable();
@@ -296,6 +397,9 @@ async function runGreedy() {
 
     setNS(best.id, 'conquered');
     flashNode(best.id, 'conquest-flash', 800);
+
+    // AFTER each successful conquest:
+    greedyConquests++;
 
     addStep(`  ✓ Acquired ${best.name} (+${best.gold}g)`, 'vis');
     log(`Greedy acquired ${best.name}! +${best.gold}g`, 'victory');

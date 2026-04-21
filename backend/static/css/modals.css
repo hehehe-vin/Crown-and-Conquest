@@ -748,6 +748,30 @@
 
 .defeat-marshal.show { display: block; }
 
+/* ── GAME OVER ── */
+.gameover-inner {
+  max-width: 480px;
+  background: linear-gradient(180deg, rgba(30,5,5,.98), rgba(10,2,2,.98));
+  border: 2px solid rgba(180,40,40,.3);
+}
+
+.gameover-body {
+  font-family: 'IM Fell English', serif;
+  font-size: .78rem;
+  color: var(--parch);
+  line-height: 1.7;
+  margin: 14px 0;
+  font-style: italic;
+}
+
+.gameover-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
 /* ════════════════════════════════════
    CHAPTER TRANSITION CINEMATIC
 ════════════════════════════════════ */

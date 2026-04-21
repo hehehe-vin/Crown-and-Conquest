@@ -9,22 +9,42 @@
 // Coordinates tuned for SVG viewBox 0 0 1000 800
 // "fog" flag controls whether stats are visible to player
 const T = [
-  { id:0,  name:"Paris",      x:155, y:358, type:"capital", status:"conquered", owner:"player",  units:5000, gold:0,    cost:0,  neighbors:[1,2,12],      revealed:true  },
-  { id:1,  name:"London",     x:125, y:225, type:"city",    status:"unvisited", owner:"neutral", units:3000, gold:400,  cost:4,  neighbors:[0,2],          revealed:false },
-  { id:2,  name:"Brussels",   x:228, y:324, type:"fort",    status:"scouted",   owner:"neutral", units:2000, gold:350,  cost:3,  neighbors:[0,1,3,5],      revealed:true  },
-  { id:3,  name:"Amsterdam",  x:258, y:272, type:"city",    status:"scouted",   owner:"neutral", units:2500, gold:480,  cost:4,  neighbors:[2,4,5],        revealed:true  },
-  { id:4,  name:"Copenhagen", x:410, y:155, type:"city",    status:"unvisited", owner:"neutral", units:2000, gold:300,  cost:5,  neighbors:[3,5],          revealed:false },
-  { id:5,  name:"Berlin",     x:460, y:284, type:"capital", status:"unvisited", owner:"enemy",   units:4500, gold:900,  cost:9,  neighbors:[2,3,4,6,13],   revealed:false },
-  { id:6,  name:"Prague",     x:488, y:366, type:"city",    status:"unvisited", owner:"neutral", units:2000, gold:380,  cost:5,  neighbors:[5,7,8,13],     revealed:false },
-  { id:7,  name:"Munich",     x:408, y:415, type:"fort",    status:"unvisited", owner:"neutral", units:1500, gold:420,  cost:4,  neighbors:[6,8,9],        revealed:false },
-  { id:8,  name:"Vienna",     x:558, y:428, type:"capital", status:"unvisited", owner:"enemy",   units:4000, gold:1100, cost:10, neighbors:[6,7,13],       revealed:false },
-  { id:9,  name:"Milan",      x:360, y:528, type:"city",    status:"unvisited", owner:"neutral", units:2200, gold:650,  cost:5,  neighbors:[7,10,12],      revealed:false },
-  { id:10, name:"Rome",       x:428, y:655, type:"city",    status:"unvisited", owner:"neutral", units:3000, gold:700,  cost:6,  neighbors:[9,11],         revealed:false },
-  { id:11, name:"Naples",     x:505, y:758, type:"fort",    status:"unvisited", owner:"neutral", units:1800, gold:500,  cost:4,  neighbors:[10],           revealed:false },
-  { id:12, name:"Madrid",     x:105, y:688, type:"city",    status:"unvisited", owner:"neutral", units:4000, gold:600,  cost:6,  neighbors:[0,9],          revealed:false },
-  { id:13, name:"Warsaw",     x:658, y:256, type:"capital", status:"unvisited", owner:"enemy",   units:3500, gold:850,  cost:9,  neighbors:[5,6,8,14],     revealed:false },
-  { id:14, name:"Moscow",     x:905, y:185, type:"capital", status:"unvisited", owner:"enemy",   units:6000, gold:1500, cost:14, neighbors:[13],           revealed:false },
+  { id:0,  name:"Paris",      x:270, y:380, type:"capital", status:"conquered", owner:"player",  units:5000, gold:0,    cost:0,  neighbors:[1,2,12],      revealed:true,  bfsScanned:true,  dfsScanned:true,  onDijkstraPath:false, conqueredTurn:0 },
+  { id:1,  name:"London",     x:240, y:260, type:"city",    status:"unvisited", owner:"neutral", units:3000, gold:400,  cost:4,  neighbors:[0,2],          revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:2,  name:"Brussels",   x:320, y:310, type:"fort",    status:"scouted",   owner:"neutral", units:2000, gold:350,  cost:3,  neighbors:[0,1,3,5],      revealed:true,  bfsScanned:true,  dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:3,  name:"Amsterdam",  x:330, y:265, type:"city",    status:"scouted",   owner:"neutral", units:2500, gold:480,  cost:4,  neighbors:[2,4,5],        revealed:true,  bfsScanned:true,  dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:4,  name:"Copenhagen", x:430, y:175, type:"city",    status:"unvisited", owner:"neutral", units:2000, gold:300,  cost:5,  neighbors:[3,5],          revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:5,  name:"Berlin",     x:490, y:280, type:"capital", status:"unvisited", owner:"enemy",   units:4500, gold:900,  cost:9,  neighbors:[2,3,4,6,13],   revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:6,  name:"Prague",     x:480, y:350, type:"city",    status:"unvisited", owner:"neutral", units:2000, gold:380,  cost:5,  neighbors:[5,7,8,13],     revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:7,  name:"Munich",     x:410, y:395, type:"fort",    status:"unvisited", owner:"neutral", units:1500, gold:420,  cost:4,  neighbors:[6,8,9],        revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:8,  name:"Vienna",     x:530, y:385, type:"capital", status:"unvisited", owner:"enemy",   units:4000, gold:1100, cost:10, neighbors:[6,7,13],       revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:9,  name:"Milan",      x:365, y:460, type:"city",    status:"unvisited", owner:"neutral", units:2200, gold:650,  cost:5,  neighbors:[7,10,12],      revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:10, name:"Rome",       x:430, y:555, type:"city",    status:"unvisited", owner:"neutral", units:3000, gold:700,  cost:6,  neighbors:[9,11],         revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:11, name:"Naples",     x:465, y:625, type:"fort",    status:"unvisited", owner:"neutral", units:1800, gold:500,  cost:4,  neighbors:[10],           revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:12, name:"Madrid",     x:165, y:530, type:"city",    status:"unvisited", owner:"neutral", units:4000, gold:600,  cost:6,  neighbors:[0,9],          revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:13, name:"Warsaw",     x:610, y:280, type:"capital", status:"unvisited", owner:"enemy",   units:3500, gold:850,  cost:9,  neighbors:[5,6,8,14],     revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
+  { id:14, name:"Moscow",     x:830, y:200, type:"capital", status:"unvisited", owner:"enemy",   units:6000, gold:1500, cost:14, neighbors:[13],           revealed:false, bfsScanned:false, dfsScanned:false, onDijkstraPath:false, conqueredTurn:0 },
 ];
+
+/**
+ * Returns the displayed garrison range for a territory.
+ * Without DFS, the player sees a range (uncertainty).
+ * With DFS, the player sees the exact number.
+ */
+function getGarrisonDisplay(t) {
+  if (t.owner === 'player') return { exact: true, value: 0, label: 'Controlled' };
+  if (!t.revealed) return { exact: false, value: 0, label: '— — —' };
+  if (t.dfsScanned) return { exact: true, value: t.units, label: t.units.toLocaleString() };
+
+  // BFS-only: show a wide range (±60% of actual)
+  const min = Math.floor(t.units * 0.4);
+  const max = Math.ceil(t.units * 2.2);
+  return {
+    exact: false,
+    min, max,
+    label: `${min.toLocaleString()} – ${max.toLocaleString()}`
+  };
+}
 
 // ── EDGES ─────────────────────────────────────────────────────
 // [nodeA, nodeB, weight] — used for SVG rendering and local Dijkstra
@@ -403,7 +423,7 @@ function applyLoot(loot) {
 function resetGameData() {
   const initialUnits  = [5000,3000,2000,2500,2000,4500,2000,1500,4000,2200,3000,1800,4000,3500,6000];
   const initialOwners = ['player','neutral','neutral','neutral','neutral','enemy','neutral','neutral','enemy','neutral','neutral','neutral','neutral','enemy','enemy'];
-  const initialStat   = ['conquered','scouted','scouted','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited'];
+  const initialStat   = ['conquered','unvisited','scouted','scouted','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited','unvisited'];
   const initialReveal = [true,false,true,true,false,false,false,false,false,false,false,false,false,false,false];
 
   T.forEach((t, i) => {
@@ -411,6 +431,11 @@ function resetGameData() {
     t.owner    = initialOwners[i];
     t.units    = initialUnits[i];
     t.revealed = initialReveal[i];
+    // Paris + initially revealed neighbors start as BFS-scanned
+    t.bfsScanned = (t.id === 0 || t.id === 2 || t.id === 3);
+    t.dfsScanned = (t.id === 0);
+    t.onDijkstraPath = false;
+    t.conqueredTurn = 0;
   });
 
   res.army   = 30000;
@@ -442,6 +467,10 @@ function getFullState() {
       status:   t.status,
       revealed: t.revealed,
       units:    t.units,
+      bfsScanned: t.bfsScanned,
+      dfsScanned: t.dfsScanned,
+      onDijkstraPath: t.onDijkstraPath,
+      conqueredTurn: t.conqueredTurn,
     })),
     story: Story.getState(),
     algo: algo,
@@ -473,6 +502,10 @@ function restoreFullState(data) {
       t.status   = saved.status   ?? t.status;
       t.revealed = saved.revealed ?? t.revealed;
       t.units    = saved.units    ?? t.units;
+      t.bfsScanned = saved.bfsScanned ?? t.bfsScanned;
+      t.dfsScanned = saved.dfsScanned ?? t.dfsScanned;
+      t.onDijkstraPath = saved.onDijkstraPath ?? t.onDijkstraPath;
+      t.conqueredTurn = saved.conqueredTurn ?? t.conqueredTurn;
     });
   }
 

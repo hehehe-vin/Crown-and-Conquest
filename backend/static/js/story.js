@@ -14,6 +14,7 @@ const Story = (() => {
   let isOpen    = false;
   let storyPath = [];
   let currentChapter = 1;
+  const _chapterCallbacks = [];
 
   // ── MARSHALS ────────────────────────────────────────────────
   const MARSHALS = {
@@ -388,7 +389,26 @@ const Story = (() => {
         if (added >= 1) break;
       }
     }
-    if (!isOpen && queue.length) show(queue.shift());
+
+    if (!isOpen && queue.length) {
+      const ev = queue.shift();
+      // Queue via ScreenQueue with cinematic lead-in
+      ScreenQueue.push('story',
+        () => show(ev),
+        {
+          hideFn: () => {
+            document.getElementById('story-modal').style.display = 'none';
+            isOpen = false;
+          },
+          cinematic: {
+            type: 'story',
+            title: ev.title,
+            subtitle: 'A decision awaits the Emperor.',
+            kicker: ev.source,
+          },
+        }
+      );
+    }
   }
 
   function updateChapter() {
@@ -408,6 +428,7 @@ const Story = (() => {
     // Chapter transition cinematic
     if (newChapter !== currentChapter && newChapter > currentChapter) {
       currentChapter = newChapter;
+      _chapterCallbacks.forEach(cb => cb(newChapter));
       showChapterTransition(newChapter);
     }
   }
@@ -416,20 +437,26 @@ const Story = (() => {
     const ch = CHAPTERS[chapterNum];
     if (!ch) return;
 
-    if (typeof playEventCinematic === 'function') {
-      playEventCinematic('chapter', ch.name, ch.epigraph, `Chapter ${ch.numeral}`);
-    }
+    ScreenQueue.push('chapter',
+      () => {
+        const el = document.getElementById('chapter-transition');
+        document.getElementById('ch-numeral').textContent   = ch.numeral;
+        document.getElementById('ch-name').textContent       = ch.name;
+        document.getElementById('ch-epigraph').textContent   = ch.epigraph;
+        el.classList.add('active');
 
-    const overlay = document.getElementById('chapter-transition');
-    document.getElementById('ch-numeral').textContent = ch.numeral;
-    document.getElementById('ch-name').textContent = ch.name;
-    document.getElementById('ch-epigraph').textContent = ch.epigraph;
-
-    overlay.classList.add('active');
-
-    setTimeout(() => {
-      overlay.classList.remove('active');
-    }, 4200);
+        // Auto-advance after 3.5 seconds
+        setTimeout(() => {
+          el.classList.remove('active');
+          ScreenQueue.next();
+        }, 3500);
+      },
+      {
+        hideFn: () => {
+          document.getElementById('chapter-transition').classList.remove('active');
+        },
+      }
+    );
   }
 
   function show(ev) {
@@ -470,11 +497,12 @@ const Story = (() => {
   }
 
   function close() {
-    document.getElementById('story-modal').style.display = 'none';
-    document.getElementById('story-choices').style.display = 'flex';
-    isOpen = false;
+    ScreenQueue.next();  // hideFn handles modal hiding
+    // Story queue processing happens after ScreenQueue advances
+    if (queue.length) {
+      setTimeout(() => check(), 500);
+    }
     updateMarshals();
-    if (queue.length) setTimeout(() => show(queue.shift()), 800);
   }
 
   function reset() {
@@ -483,6 +511,7 @@ const Story = (() => {
     isOpen    = false;
     storyPath = [];
     currentChapter = 1;
+    ScreenQueue.clear();
 
     Object.assign(MARSHALS.murat,      { loyalty:80, alive:true, glory:0 });
     Object.assign(MARSHALS.ney,        { loyalty:90, alive:true, glory:0 });
@@ -714,6 +743,7 @@ const Story = (() => {
     marshalStatus,
     getState,
     restoreState,
+    onChapterChange: (callback) => { _chapterCallbacks.push(callback); },
   };
 
 })();
